@@ -17,6 +17,14 @@ export function criarApp() {
     }
   });
 
+  app.get('/api/doacoes/aceitas', async (req, res) => {
+    try {
+      res.json(await doacoes.listarAceitas());
+    } catch (erro) {
+      res.status(400).json({ erro: erro.message });
+    }
+  });
+
   app.post('/api/doacoes', async (req, res) => {
     try {
       res.status(201).json(await doacoes.criarDoacao(req.body));
@@ -28,6 +36,14 @@ export function criarApp() {
   app.post('/api/doacoes/:id/aceitar', async (req, res) => {
     try {
       res.json(await doacoes.aceitar(req.params.id, req.body?.ong ?? 'ONG'));
+    } catch (erro) {
+      res.status(400).json({ erro: erro.message });
+    }
+  });
+
+  app.post('/api/doacoes/:id/coletar', async (req, res) => {
+    try {
+      res.json(await doacoes.coletar(req.params.id));
     } catch (erro) {
       res.status(400).json({ erro: erro.message });
     }
