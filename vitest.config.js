@@ -6,7 +6,9 @@ export default {
     coverage: {
       include: ['src/**/*.js'],
       exclude: ['src/server.js'],
-      reporter: ['text', 'html'],
+      // json-summary e json alimentam o comentário de cobertura no PR (CI).
+      reporter: ['text', 'html', 'json-summary', 'json'],
+      reportOnFailure: true,
     },
   },
 };
