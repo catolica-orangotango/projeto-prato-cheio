@@ -56,3 +56,26 @@ export async function aceitar(id, ong) {
   }
   return aceita;
 }
+
+// "O entregador vê as doações aceitas que aguardam retirada."
+export async function listarAceitas() {
+  return repo.listarAceitas();
+}
+
+// "O entregador confirma a retirada da doação no local do doador." (história 3)
+// Só uma doação aceita pode ser coletada, e uma única vez.
+export async function coletar(id) {
+  const doacao = await repo.buscarPorId(id);
+  if (!doacao) {
+    throw new Error('doação não encontrada');
+  }
+  if (doacao.status === 'disponivel') {
+    throw new Error('doação ainda não foi aceita por uma ONG');
+  }
+
+  const coletada = await repo.coletar(id);
+  if (!coletada) {
+    throw new Error('doação já foi coletada');
+  }
+  return coletada;
+}

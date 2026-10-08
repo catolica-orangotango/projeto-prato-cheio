@@ -7,6 +7,10 @@ on:
     branches: [main]
   pull_request:
 
+# O job só lê o código: o GITHUB_TOKEN não precisa de escrita.
+permissions:
+  contents: read
+
 jobs:
   build-e-testes:
     runs-on: ubuntu-latest

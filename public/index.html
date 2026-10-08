@@ -86,6 +86,9 @@
     <ul id="lista"></ul>
   </main>
 
+  <h2>Aguardando retirada</h2>
+  <ul id="aceitas"></ul>
+
   <script>
     async function carregar() {
       const res = await fetch('/api/doacoes');
@@ -106,6 +109,29 @@
             body: JSON.stringify({ ong: 'Minha ONG' })
           });
           carregar();
+        };
+        li.appendChild(botao);
+        lista.appendChild(li);
+      }
+      carregarAceitas();
+    }
+
+    // História 3: o entregador confirma a retirada no local do doador.
+    async function carregarAceitas() {
+      const res = await fetch('/api/doacoes/aceitas');
+      const doacoes = await res.json();
+      const lista = document.getElementById('aceitas');
+      lista.innerHTML = doacoes.length
+        ? ''
+        : '<li>Nenhuma doação aguardando retirada.</li>';
+      for (const d of doacoes) {
+        const li = document.createElement('li');
+        li.textContent = `${d.tipo}: ${d.quantidade} ${d.unidade} (até ${d.validade}), aceita por ${d.ong} `;
+        const botao = document.createElement('button');
+        botao.textContent = 'Confirmar retirada';
+        botao.onclick = async () => {
+          await fetch(`/api/doacoes/${d.id}/coletar`, { method: 'POST' });
+          carregarAceitas();
         };
         li.appendChild(botao);
         lista.appendChild(li);
