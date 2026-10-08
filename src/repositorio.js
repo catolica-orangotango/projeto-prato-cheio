@@ -11,7 +11,7 @@ export async function inserir({ tipo, quantidade, unidade, validade }) {
     `INSERT INTO doacoes (tipo, quantidade, unidade, validade)
      VALUES (?, ?, ?, ?)
      RETURNING *`,
-    [tipo, quantidade, unidade, validade]
+    [tipo, quantidade, unidade, validade],
   );
   return rows[0];
 }
@@ -23,7 +23,7 @@ export async function listarDisponiveis() {
     `SELECT * FROM doacoes
      WHERE status = 'disponivel'
        AND validade >= date('now')
-     ORDER BY validade ASC, id ASC`
+     ORDER BY validade ASC, id ASC`,
   );
   return rows;
 }
@@ -41,10 +41,34 @@ export async function buscarPorId(id) {
 export async function aceitar(id, ong) {
   const { rows } = await query(
     `UPDATE doacoes
-     SET status = 'aceita', ong = ?
+     SET status = 'aceita', ong = ?, aceita_em = datetime('now')
      WHERE id = ? AND status = 'disponivel'
      RETURNING *`,
-    [ong, id]
+    [ong, id],
+  );
+  return rows[0];
+}
+
+// Doações aceitas aguardando retirada pelo entregador, mais urgentes primeiro.
+export async function listarAceitas() {
+  const { rows } = await query(
+    `SELECT * FROM doacoes
+     WHERE status = 'aceita'
+     ORDER BY validade ASC, id ASC`,
+  );
+  return rows;
+}
+
+// Marca a doação como coletada e devolve a linha atualizada.
+// Mesma trava do aceite: o `AND status = 'aceita'` impede coletar uma doação
+// que ainda não foi aceita ou confirmar duas vezes a mesma retirada.
+export async function coletar(id) {
+  const { rows } = await query(
+    `UPDATE doacoes
+     SET status = 'coletada', coletada_em = datetime('now')
+     WHERE id = ? AND status = 'aceita'
+     RETURNING *`,
+    [id],
   );
   return rows[0];
 }

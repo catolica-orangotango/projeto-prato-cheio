@@ -8,14 +8,24 @@
     "start": "node --no-warnings=ExperimentalWarning src/server.js",
     "dev": "node --no-warnings=ExperimentalWarning --watch src/server.js",
     "test": "vitest run",
-    "db:migrar": "node --no-warnings=ExperimentalWarning -e \"import('./src/db.js').then(async d=>{await d.migrar();console.log('schema criado');await d.encerrar()})\""
+    "db:migrar": "node --no-warnings=ExperimentalWarning -e \"import('./src/db.js').then(async d=>{await d.migrar();console.log('schema criado');await d.encerrar()})\"",
+    "test:cobertura": "vitest run --coverage",
+    "lint": "eslint .",
+    "formatar": "prettier --write \"src/**/*.js\" \"tests/**/*.js\" \"*.config.js\"",
+    "formatar:checar": "prettier --check \"src/**/*.js\" \"tests/**/*.js\" \"*.config.js\""
   },
   "dependencies": {
     "express": "^4.19.2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
     "supertest": "^7.0.0",
-    "vitest": "^2.1.8"
+    "vitest": "^5.0.3"
   },
   "engines": {
     "node": ">=22.13"

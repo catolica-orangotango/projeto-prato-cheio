@@ -7,9 +7,17 @@ on:
     branches: [main]
   pull_request:
 
+# Por padrão o GITHUB_TOKEN só lê o código.
+permissions:
+  contents: read
+
 jobs:
   build-e-testes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Para comentar a cobertura de testes no PR.
+      pull-requests: write
 
     # ---------------------------------------------------------------------
     # UNIDADE 3 — quando migrarem para PostgreSQL, descomentem este bloco e
@@ -46,8 +54,29 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Rodar os testes
-        run: npm test
+      - name: Verificar o lint
+        run: npm run lint
+
+      - name: Verificar a formatação
+        run: npm run formatar:checar
+
+      - name: Rodar os testes (com cobertura)
+        run: npm run test:cobertura
+
+      # Comenta no PR a cobertura total e a dos arquivos alterados no PR.
+      # Também escreve o resumo na página do run.
+      - name: Publicar a cobertura no PR
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+
+      # Relatório HTML navegável (linhas sem teste), para baixar no run.
+      - name: Guardar o relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-cobertura
+          path: coverage/
+          retention-days: 14
 
       - name: Verificar se a aplicação sobe
         run: |

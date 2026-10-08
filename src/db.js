@@ -42,9 +42,21 @@ export async function migrar() {
       validade    TEXT NOT NULL,
       status      TEXT NOT NULL DEFAULT 'disponivel',
       ong         TEXT,
-      criada_em   TEXT NOT NULL DEFAULT (datetime('now'))
+      criada_em   TEXT NOT NULL DEFAULT (datetime('now')),
+      aceita_em   TEXT,
+      coletada_em TEXT
     )
   `);
+
+  // Bancos criados antes da história 3 não têm os carimbos de aceite e coleta:
+  // acrescenta as colunas que faltarem, sem perder os dados existentes.
+  const existentes = conexao()
+    .prepare('PRAGMA table_info(doacoes)')
+    .all()
+    .map((c) => c.name);
+  for (const coluna of ['aceita_em', 'coletada_em']) {
+    if (!existentes.includes(coluna)) conexao().exec(`ALTER TABLE doacoes ADD COLUMN ${coluna} TEXT`);
+  }
 }
 
 /** Apaga todos os dados. Usado pelos testes. */
@@ -53,5 +65,8 @@ export async function limparBanco() {
 }
 
 export async function encerrar() {
-  if (db) { db.close(); db = undefined; }
+  if (db) {
+    db.close();
+    db = undefined;
+  }
 }
