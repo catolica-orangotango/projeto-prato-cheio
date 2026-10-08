@@ -50,8 +50,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Rodar os testes
-        run: npm test
+      - name: Verificar o lint
+        run: npm run lint
+
+      - name: Verificar a formatação
+        run: npm run formatar:checar
+
+      - name: Rodar os testes (com cobertura)
+        run: npm run test:cobertura
 
       - name: Verificar se a aplicação sobe
         run: |
