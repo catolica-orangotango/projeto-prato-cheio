@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "supertest": "^7.0.0",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=22.13"
