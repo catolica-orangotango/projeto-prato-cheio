@@ -10,3 +10,6 @@ dados.sqlite-journal
 
 # artefatos temporários do vitest
 *.timestamp-*
+
+# relatório de cobertura (npm run test:cobertura)
+coverage/

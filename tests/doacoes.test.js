@@ -66,9 +66,7 @@ describe('publicar e listar doações', () => {
 
   // CA 1.2: publicação sem dado obrigatório é recusada
   it('recusa doação sem os campos obrigatórios', async () => {
-    const res = await request(app)
-      .post('/api/doacoes')
-      .send({ tipo: 'Pão' }); // sem quantidade, unidade e validade
+    const res = await request(app).post('/api/doacoes').send({ tipo: 'Pão' }); // sem quantidade, unidade e validade
 
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/obrigat/i);
@@ -79,11 +77,15 @@ describe('publicar e listar doações', () => {
 
   // RN1: quantidade tem de ser maior que zero
   it('recusa doação com quantidade zero ou negativa', async () => {
-    const zero = await request(app).post('/api/doacoes').send(doacaoValida({ quantidade: 0 }));
+    const zero = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ quantidade: 0 }));
     expect(zero.status).toBe(400);
     expect(zero.body.erro).toMatch(/quantidade/i);
 
-    const negativa = await request(app).post('/api/doacoes').send(doacaoValida({ quantidade: -3 }));
+    const negativa = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ quantidade: -3 }));
     expect(negativa.status).toBe(400);
 
     const lista = await request(app).get('/api/doacoes');
@@ -92,7 +94,9 @@ describe('publicar e listar doações', () => {
 
   // RN1 / RN2: validade já vencida é recusada na publicação
   it('recusa doação com validade já vencida', async () => {
-    const res = await request(app).post('/api/doacoes').send(doacaoValida({ validade: validadePassada }));
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ validade: validadePassada }));
 
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/validade/i);
@@ -114,9 +118,15 @@ describe('publicar e listar doações', () => {
 
   // CA 2.3: a lista vem ordenada da validade mais próxima para a mais distante
   it('lista as doações da validade mais próxima para a mais distante', async () => {
-    await request(app).post('/api/doacoes').send(doacaoValida({ tipo: 'Longe', validade: emDias(9) }));
-    await request(app).post('/api/doacoes').send(doacaoValida({ tipo: 'Perto', validade: emDias(2) }));
-    await request(app).post('/api/doacoes').send(doacaoValida({ tipo: 'Médio', validade: emDias(5) }));
+    await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ tipo: 'Longe', validade: emDias(9) }));
+    await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ tipo: 'Perto', validade: emDias(2) }));
+    await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ tipo: 'Médio', validade: emDias(5) }));
 
     const res = await request(app).get('/api/doacoes');
     expect(res.body.map((d) => d.tipo)).toEqual(['Perto', 'Médio', 'Longe']);
@@ -143,9 +153,7 @@ describe('aceitar uma doação', () => {
   it('marca a doação como aceita pela ONG', async () => {
     const doacao = await publicar();
 
-    const res = await request(app)
-      .post(`/api/doacoes/${doacao.id}/aceitar`)
-      .send({ ong: 'Casa da Sopa' });
+    const res = await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'Casa da Sopa' });
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('aceita');
@@ -156,9 +164,7 @@ describe('aceitar uma doação', () => {
   // CA 2.1: a doação aceita sai da lista pública
   it('remove a doação da lista de disponíveis depois de aceita', async () => {
     const doacao = await publicar();
-    await request(app)
-      .post(`/api/doacoes/${doacao.id}/aceitar`)
-      .send({ ong: 'ONG A' });
+    await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'ONG A' });
 
     const lista = await request(app).get('/api/doacoes');
     expect(lista.body).toHaveLength(0);
@@ -168,23 +174,17 @@ describe('aceitar uma doação', () => {
   it('recusa aceitar uma doação que já foi aceita por outra ONG', async () => {
     const doacao = await publicar();
 
-    const primeira = await request(app)
-      .post(`/api/doacoes/${doacao.id}/aceitar`)
-      .send({ ong: 'ONG A' });
+    const primeira = await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'ONG A' });
     expect(primeira.status).toBe(200);
 
-    const segunda = await request(app)
-      .post(`/api/doacoes/${doacao.id}/aceitar`)
-      .send({ ong: 'ONG B' });
+    const segunda = await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'ONG B' });
     expect(segunda.status).toBe(400);
     expect(segunda.body.erro).toMatch(/já foi aceita/i);
   });
 
   // Caminho de erro: aceitar uma doação que não existe
   it('recusa aceitar uma doação inexistente', async () => {
-    const res = await request(app)
-      .post('/api/doacoes/999999/aceitar')
-      .send({ ong: 'ONG A' });
+    const res = await request(app).post('/api/doacoes/999999/aceitar').send({ ong: 'ONG A' });
 
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/não encontrada/i);
@@ -194,9 +194,7 @@ describe('aceitar uma doação', () => {
   it('usa "ONG" como valor padrão quando o corpo não informa a ong', async () => {
     const doacao = await publicar();
 
-    const res = await request(app)
-      .post(`/api/doacoes/${doacao.id}/aceitar`)
-      .send({});
+    const res = await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({});
 
     expect(res.status).toBe(200);
     expect(res.body.ong).toBe('ONG');
@@ -323,25 +321,33 @@ describe('validações adicionais de publicação', () => {
   });
 
   it('recusa quantidade não inteira', async () => {
-    const res = await request(app).post('/api/doacoes').send(doacaoValida({ quantidade: 1.5 }));
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ quantidade: 1.5 }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/quantidade/i);
   });
 
   it('recusa quantidade que não é um número', async () => {
-    const res = await request(app).post('/api/doacoes').send(doacaoValida({ quantidade: 'abc' }));
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ quantidade: 'abc' }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/quantidade/i);
   });
 
   it('recusa validade fora do formato AAAA-MM-DD', async () => {
-    const res = await request(app).post('/api/doacoes').send(doacaoValida({ validade: '31/12/2026' }));
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ validade: '31/12/2026' }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/validade/i);
   });
 
   it('trata campo só com espaços em branco como ausente', async () => {
-    const res = await request(app).post('/api/doacoes').send(doacaoValida({ tipo: '   ' }));
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ tipo: '   ' }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/obrigat/i);
   });

@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Dependências do npm: um PR por semana, agrupando as atualizações
+  # menores para não encher o repositório de PRs.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      dependencias-menores:
+        update-types: [minor, patch]
+
+  # Versões das actions usadas nos workflows (checkout, setup-node...).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

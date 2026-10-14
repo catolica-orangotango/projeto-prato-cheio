@@ -50,7 +50,10 @@ export async function migrar() {
 
   // Bancos criados antes da história 3 não têm os carimbos de aceite e coleta:
   // acrescenta as colunas que faltarem, sem perder os dados existentes.
-  const existentes = conexao().prepare('PRAGMA table_info(doacoes)').all().map((c) => c.name);
+  const existentes = conexao()
+    .prepare('PRAGMA table_info(doacoes)')
+    .all()
+    .map((c) => c.name);
   for (const coluna of ['aceita_em', 'coletada_em']) {
     if (!existentes.includes(coluna)) conexao().exec(`ALTER TABLE doacoes ADD COLUMN ${coluna} TEXT`);
   }
@@ -62,5 +65,8 @@ export async function limparBanco() {
 }
 
 export async function encerrar() {
-  if (db) { db.close(); db = undefined; }
+  if (db) {
+    db.close();
+    db = undefined;
+  }
 }

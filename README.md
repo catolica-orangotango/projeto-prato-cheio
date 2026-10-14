@@ -26,6 +26,14 @@ npm test          # roda os testes
 npm run dev       # sobe recarregando a cada alteração
 ```
 
+Qualidade de código (o CI roda os três):
+
+```bash
+npm run lint             # ESLint: aponta erros comuns no código
+npm run formatar         # Prettier: formata src/, tests/ e configs
+npm run test:cobertura   # testes + relatório de cobertura em coverage/index.html
+```
+
 Os testes usam SQLite **em memória**, então não sujam o banco de desenvolvimento.
 
 > Ao rodar `npm test` o Node imprime `ExperimentalWarning: SQLite is an experimental feature`.
