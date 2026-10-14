@@ -150,6 +150,7 @@ describe('aceitar uma doação', () => {
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('aceita');
     expect(res.body.ong).toBe('Casa da Sopa');
+    expect(res.body.aceita_em).toBeTruthy(); // data/hora do aceite (história 4 e experimento)
   });
 
   // CA 2.1: a doação aceita sai da lista pública
@@ -199,6 +200,112 @@ describe('aceitar uma doação', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.ong).toBe('ONG');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// História 3: o entregador confirma a retirada de uma doação aceita pela ONG.
+// ---------------------------------------------------------------------------
+describe('confirmar a retirada de uma doação', () => {
+  beforeEach(async () => {
+    await migrar();
+    await limparBanco();
+  });
+  afterAll(async () => {
+    await encerrar();
+  });
+
+  async function publicarEAceitar() {
+    const { body: doacao } = await request(app).post('/api/doacoes').send(doacaoValida());
+    await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'Casa da Sopa' });
+    return doacao;
+  }
+
+  // CA 3.1: retirada de doação aceita
+  it('marca a doação aceita como coletada e registra a data/hora da coleta', async () => {
+    const doacao = await publicarEAceitar();
+
+    const res = await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('coletada');
+    expect(res.body.ong).toBe('Casa da Sopa');
+    expect(res.body.coletada_em).toBeTruthy();
+  });
+
+  // CA 3.1: a doação coletada sai das pendentes de retirada
+  it('lista as aceitas pendentes de retirada e remove a doação depois de coletada', async () => {
+    const doacao = await publicarEAceitar();
+
+    const antes = await request(app).get('/api/doacoes/aceitas');
+    expect(antes.status).toBe(200);
+    expect(antes.body.map((d) => d.id)).toEqual([doacao.id]);
+
+    await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+
+    const depois = await request(app).get('/api/doacoes/aceitas');
+    expect(depois.body).toHaveLength(0);
+  });
+
+  // CA 3.2: não é possível coletar uma doação que nenhuma ONG aceitou
+  it('recusa confirmar a retirada de uma doação ainda disponível', async () => {
+    const { body: doacao } = await request(app).post('/api/doacoes').send(doacaoValida());
+
+    const res = await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/ainda não foi aceita/i);
+
+    const lista = await request(app).get('/api/doacoes');
+    expect(lista.body.map((d) => d.id)).toEqual([doacao.id]); // continua disponível
+  });
+
+  // CA 3.3: não é possível confirmar a mesma retirada duas vezes
+  it('recusa confirmar duas vezes e mantém a data/hora da primeira coleta', async () => {
+    const doacao = await publicarEAceitar();
+
+    const primeira = await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+    expect(primeira.status).toBe(200);
+
+    const segunda = await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+    expect(segunda.status).toBe(400);
+    expect(segunda.body.erro).toMatch(/já foi coletada/i);
+
+    const gravada = await repo.buscarPorId(doacao.id);
+    expect(gravada.coletada_em).toBe(primeira.body.coletada_em);
+  });
+
+  // Jornada completa: publicar -> aceitar -> confirmar retirada, conferindo as
+  // duas listas que a interface mostra a cada etapa.
+  it('acompanha a doação da publicação até a retirada nas duas listas', async () => {
+    const ids = async (rota) => (await request(app).get(rota)).body.map((d) => d.id);
+
+    const { body: doacao } = await request(app).post('/api/doacoes').send(doacaoValida());
+    expect(await ids('/api/doacoes')).toEqual([doacao.id]);
+    expect(await ids('/api/doacoes/aceitas')).toEqual([]);
+
+    const aceita = await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong: 'Casa da Sopa' });
+    expect(aceita.body.status).toBe('aceita');
+    expect(await ids('/api/doacoes')).toEqual([]);
+    expect(await ids('/api/doacoes/aceitas')).toEqual([doacao.id]);
+
+    const coletada = await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+    expect(coletada.body.status).toBe('coletada');
+    expect(await ids('/api/doacoes')).toEqual([]);
+    expect(await ids('/api/doacoes/aceitas')).toEqual([]);
+
+    const gravada = await repo.buscarPorId(doacao.id);
+    expect(gravada.criada_em).toBeTruthy();
+    expect(gravada.aceita_em).toBeTruthy();
+    expect(gravada.coletada_em).toBeTruthy();
+  });
+
+  // CA 3.4: doação inexistente
+  it('recusa confirmar a retirada de uma doação inexistente', async () => {
+    const res = await request(app).post('/api/doacoes/999999/coletar');
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/não encontrada/i);
   });
 });
 

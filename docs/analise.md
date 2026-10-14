@@ -54,7 +54,7 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 |---|---|---|
 | 1 | Como **doador**, quero cadastrar uma doação, para que as ONGs a identifiquem e coletem antes que estrague. | Sã. É a metade "publicar" da história zero. |
 | 2 | Como **funcionário de ONG**, quero selecionar uma doação disponível, para que o entregador a colete antes que estrague. | Depende da 1 (não totalmente **I**ndependente), aceitável. É a metade "aceitar" da história zero. |
-| 3 | Como **entregador**, quero confirmar a presença do doador no ponto de entrega, para receber a doação. | Falha **V** e **I**: não entrega valor sozinha (não há fluxo de coleta) e "ponto de entrega" é conceito não modelado. Adiada para a U2. |
+| 3 | Como **entregador**, quero confirmar a retirada de uma doação aceita pela minha ONG no local do doador, para que a ONG saiba que o alimento foi recebido e a doação saia das pendentes. | Reformulada na U2. A versão original ("confirmar a presença do doador no ponto de entrega") falhava **V** e **I**: não havia fluxo de coleta e "ponto de entrega" não era modelado. A nova versão fecha o ciclo aceita → coletada. Localização fica com a RN4. |
 | 4 | Como **coordenador da ONG**, quero saber quantas doações coletamos num período, para acompanhar o volume. | Sã em valor, mas só **E**stimável depois de existir histórico de coletas. Critérios definidos; implementação na U2. |
 | 5 | Como **agente da vigilância sanitária**, quero consultar os alimentos perecíveis em estoque da ONG, para auditar a qualidade. | Falha **E** e **S**: "estoque" pressupõe inventário no tempo, que o modelo não tem. Precisa ser fatiada. Adiada para a U2. |
 
@@ -71,6 +71,13 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 - **CA 2.1**: Dado uma doação "disponível"; Quando a ONG a aceita; Então ela passa para "aceita", fica vinculada a essa ONG e sai da lista pública.
 - **CA 2.2**: Dado uma doação já aceita pela ONG A; Quando a ONG B tenta aceitar a mesma doação; Então o sistema recusa, informa que já foi aceita e o vínculo com a ONG A é mantido.
 - **CA 2.3**: Dado que a ONG abre a lista de disponíveis; Quando a lista é exibida; Então cada item mostra tipo, quantidade/unidade e validade, e a lista vem ordenada da validade mais próxima para a mais distante.
+
+**História 3: entregador confirma a retirada** (implementada na U2)
+
+- **CA 3.1**: Dado uma doação "aceita"; Quando o entregador confirma a retirada; Então ela passa para "coletada", registra a data/hora da coleta (`coletada_em`) e sai da lista de pendentes de retirada.
+- **CA 3.2**: Dado uma doação ainda "disponível" (nenhuma ONG aceitou); Quando o entregador tenta confirmar a retirada; Então o sistema recusa e informa que a doação ainda não foi aceita.
+- **CA 3.3**: Dado uma doação já "coletada"; Quando o entregador confirma de novo; Então o sistema recusa e a data/hora da primeira coleta é mantida.
+- **CA 3.4**: Dado um identificador de doação inexistente; Quando o entregador confirma a retirada; Então o sistema informa que a doação não foi encontrada.
 
 **História 4: coordenador acompanha o volume coletado** (critérios definidos; implementação na U2)
 
