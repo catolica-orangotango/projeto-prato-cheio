@@ -15,7 +15,7 @@
     "formatar:checar": "prettier --check \"src/**/*.js\" \"tests/**/*.js\" \"*.config.js\""
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.22.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
