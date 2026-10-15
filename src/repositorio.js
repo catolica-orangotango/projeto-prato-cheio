@@ -72,3 +72,19 @@ export async function coletar(id) {
   );
   return rows[0];
 }
+
+// Quantas doações a ONG coletou entre as datas `inicio` e `fim` (AAAA-MM-DD),
+// contando os dois dias. Só entra o que foi de fato retirado (status 'coletada'),
+// pela data da coleta. História 4 / ADR 0004.
+// Limitação: coletada_em está em UTC, então o dia comparado é o dia em UTC
+// (coleta depois das 21h no Brasil conta no dia seguinte). Ver ADR 0004.
+export async function contarColetadas(ong, inicio, fim) {
+  const { rows } = await query(
+    `SELECT COUNT(*) AS total FROM doacoes
+     WHERE status = 'coletada'
+       AND ong = ?
+       AND date(coletada_em) BETWEEN ? AND ?`,
+    [ong, inicio, fim],
+  );
+  return rows[0].total;
+}

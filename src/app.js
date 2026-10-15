@@ -49,5 +49,14 @@ export function criarApp() {
     }
   });
 
+  // História 4: total de doações coletadas pela ONG no período.
+  app.get('/api/relatorios/coletas', async (req, res) => {
+    try {
+      res.json(await doacoes.totalColetadas(req.query));
+    } catch (erro) {
+      res.status(400).json({ erro: erro.message });
+    }
+  });
+
   return app;
 }
