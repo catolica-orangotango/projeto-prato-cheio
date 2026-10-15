@@ -84,6 +84,11 @@ teste automatizado, embora um critério possa virar um ou mais testes.
   - **Quando** o coordenador da ONG A consulta o total
   - **Então** apenas as doações aceitas pela ONG A são contadas.
 
+> **Revisão (U2):** estes são os critérios como foram escritos em aula. Depois que a
+> história 3 passou a registrar a coleta, eles foram revisados para contar doações
+> **coletadas** pela data de coleta, com os novos CA 4.4 e 4.5. A versão vigente está
+> em `docs/analise.md` e a decisão em `docs/adr/0004-hu4-conta-doacoes-coletadas.md`.
+
 > Das três histórias acima, a **1** e a **2** compõem a história zero e já estão
 > implementadas e testadas (seção 4). A **4** tem os critérios definidos, mas a
 > implementação fica para a Unidade 2.

@@ -55,7 +55,7 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 | 1 | Como **doador**, quero cadastrar uma doação, para que as ONGs a identifiquem e coletem antes que estrague. | Sã. É a metade "publicar" da história zero. |
 | 2 | Como **funcionário de ONG**, quero selecionar uma doação disponível, para que o entregador a colete antes que estrague. | Depende da 1 (não totalmente **I**ndependente), aceitável. É a metade "aceitar" da história zero. |
 | 3 | Como **entregador**, quero confirmar a retirada de uma doação aceita pela minha ONG no local do doador, para que a ONG saiba que o alimento foi recebido e a doação saia das pendentes. | Reformulada na U2. A versão original ("confirmar a presença do doador no ponto de entrega") falhava **V** e **I**: não havia fluxo de coleta e "ponto de entrega" não era modelado. A nova versão fecha o ciclo aceita → coletada. Localização fica com a RN4. |
-| 4 | Como **coordenador da ONG**, quero saber quantas doações coletamos num período, para acompanhar o volume. | Sã em valor, mas só **E**stimável depois de existir histórico de coletas. Critérios definidos; implementação na U2. |
+| 4 | Como **coordenador da ONG**, quero saber quantas doações coletamos num período, para acompanhar o volume. | Só ficou **E**stimável depois da história 3, que registra a coleta. Critérios revisados na U2 para contar coletas, não aceites ([ADR 0004](adr/0004-hu4-conta-doacoes-coletadas.md)). |
 | 5 | Como **agente da vigilância sanitária**, quero consultar os alimentos perecíveis em estoque da ONG, para auditar a qualidade. | Falha **E** e **S**: "estoque" pressupõe inventário no tempo, que o modelo não tem. Precisa ser fatiada. Adiada para a U2. |
 
 ## Critérios de aceite
@@ -79,11 +79,13 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 - **CA 3.3**: Dado uma doação já "coletada"; Quando o entregador confirma de novo; Então o sistema recusa e a data/hora da primeira coleta é mantida.
 - **CA 3.4**: Dado um identificador de doação inexistente; Quando o entregador confirma a retirada; Então o sistema informa que a doação não foi encontrada.
 
-**História 4: coordenador acompanha o volume coletado** (critérios definidos; implementação na U2)
+**História 4: coordenador acompanha o volume coletado** (implementada na U2; critérios revisados no [ADR 0004](adr/0004-hu4-conta-doacoes-coletadas.md))
 
-- **CA 4.1**: Dado um intervalo de datas; Quando o coordenador consulta o total de doações aceitas pela sua ONG no intervalo; Então o sistema retorna a quantidade cuja data de aceite está dentro do intervalo.
+- **CA 4.1**: Dado um intervalo de datas (início e fim, AAAA-MM-DD); Quando o coordenador consulta o total de doações coletadas pela sua ONG no intervalo; Então o sistema retorna quantas foram coletadas com data de coleta dentro do intervalo, incluindo os dias de início e fim.
 - **CA 4.2**: Dado um intervalo sem coletas da ONG; Quando o coordenador consulta; Então o sistema retorna zero, sem erro.
-- **CA 4.3**: Dado doações aceitas por várias ONGs no mesmo período; Quando o coordenador da ONG A consulta; Então apenas as doações da ONG A são contadas.
+- **CA 4.3**: Dado doações coletadas por várias ONGs no mesmo período; Quando o coordenador da ONG A consulta; Então apenas as doações da ONG A são contadas.
+- **CA 4.4**: Dado doações da ONG aceitas mas ainda não coletadas; Quando o coordenador consulta o período; Então essas doações não entram no total.
+- **CA 4.5**: Dado uma consulta sem a ONG, com data em formato inválido ou com início depois do fim; Quando o coordenador consulta; Então o sistema recusa e informa o motivo.
 
 ## Riscos
 
