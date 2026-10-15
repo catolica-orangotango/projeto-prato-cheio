@@ -31,6 +31,7 @@ Os critérios completos (CA 4.1 a 4.5) estão na issue #5.
 - **Positivas:** o número que o coordenador vê é o volume que de fato saiu do doador. A história alimenta o indicador "doações coletadas por semana" sem trabalho extra.
 - **Negativas / o que abrimos mão:** o critério acordado em aula muda, e os docs da aula 4 e da análise passam a divergir da issue até serem atualizados. A taxa de aceite sem coleta não aparece para o coordenador.
 - **Riscos:** o grupo pode não concordar com a troca. Nesse caso, este ADR passa a "substituído" e a issue volta aos critérios originais. Coletas feitas fora do sistema (pelo WhatsApp) não têm `coletada_em` e não aparecem na contagem; o coordenador precisa saber que o total cobre só o que passou pela plataforma.
+- **Limitação conhecida (fuso horário):** `coletada_em` é gravada em UTC (`datetime('now')`, desde a história 3) e a contagem compara o dia em UTC. Uma coleta feita no Brasil depois das 21h (UTC−3) conta no dia seguinte, o que pode mover coletas de borda entre períodos. Fica para resolver junto com a migração para PostgreSQL (ADR 0001), usando `timestamptz` e o fuso da ONG na consulta, em vez de um deslocamento fixo agora no SQLite.
 
 ## Rastreabilidade
 - História 4 e CA 4.1–4.3 em `docs/analise.md` e `docs/atividades/aula4.md`.
