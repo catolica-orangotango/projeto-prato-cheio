@@ -1,0 +1,58 @@
+@startuml casos-de-uso-final
+!pragma layout smetana
+left to right direction
+title Prato Cheio - Diagrama de Casos de Uso (versão final)
+
+skinparam usecase {
+  BackgroundColor<<U2>> #F2F2F2
+  BorderColor<<U2>> #999999
+  FontColor<<U2>> #777777
+}
+
+actor "Doador\n(restaurante, padaria, mercado)" as Doador
+actor "Funcionário de ONG" as ONG
+actor "Entregador" as Entregador
+actor "Coordenador da ONG" as Coord
+actor "Agente da Vigilância\nSanitária" as Vig
+
+rectangle "Prato Cheio" {
+  usecase "Publicar doação\n(H1)" as UC1
+  usecase "Ver doações disponíveis\n(H2)" as UC2
+  usecase "Aceitar doação\n(H2)" as UC3
+
+  usecase "Confirmar coleta\n(H3)" as UC4 <<U2>>
+  usecase "Consultar volume coletado\n(H4)" as UC5 <<U2>>
+  usecase "Consultar perecíveis da ONG\n(H5, ainda a fatiar)" as UC6 <<U2>>
+}
+
+Doador -- UC1
+ONG -- UC2
+ONG -- UC3
+Entregador -- UC4
+Coord -- UC5
+Vig -- UC6
+
+note right of UC1
+  RN1: tipo, quantidade (inteiro > 0),
+  unidade e validade (hoje ou futura).
+  Inválido: recusa com 400, nada é gravado.
+end note
+
+note right of UC2
+  RN2: só status 'disponivel' e
+  validade >= hoje, ordenadas
+  pela validade mais próxima (CA 2.3).
+end note
+
+note right of UC3
+  RN3: só a primeira ONG consegue;
+  a segunda recebe erro (CA 2.2).
+  A ONG é identificada por um nome
+  livre: não há login.
+end note
+
+legend right
+  Casos de uso cinzas (<<U2>>): levantados na análise,
+  adiados para a Unidade 2. Não existem no sistema hoje.
+endlegend
+@enduml
