@@ -10,8 +10,8 @@ Grupo:
 
 1. LINK DO REPOSITÓRIO E DO PULL REQUEST
 ----------------------------------------
-Repositório:   https://github.com/Luis-Fernando-Pereira/projeto-prato-cheio
-Pull Request:  https://github.com/Luis-Fernando-Pereira/projeto-prato-cheio/pull/__  (PREENCHER)
+Repositório:   https://github.com/catolica-orangotango/projeto-prato-cheio
+Pull Request:  https://github.com/catolica-orangotango/projeto-prato-cheio/pull/__  (PREENCHER)
 Branch:        docs/diagramas
 
 
@@ -21,10 +21,10 @@ a) Diagrama de Casos de Uso (UML)
    Pergunta que responde: quem usa o sistema e para quê? O que já existe e o que
    ainda é só plano?
    Justificativa: o caso tem 5 histórias e 5 papéis diferentes (doador, funcionário
-   de ONG, entregador, coordenador, vigilância sanitária), mas só a história zero
-   (H1 + H2) foi implementada. O diagrama mostra o escopo real e separa o que foi
-   adiado para a U2, ligando cada caso de uso à sua história (H1 a H5) e às regras
-   de negócio (RN1 a RN3).
+   de ONG, entregador, coordenador, vigilância sanitária), mas só H1, H2 e H3 estão
+   implementadas. O diagrama mostra o escopo real e separa o que ainda está pendente
+   (H4, H5), ligando cada caso de uso à sua história (H1 a H5) e às regras de
+   negócio (RN1 a RN3).
 
 b) Diagrama de Classes (UML)
    Pergunta que responde: quais são os elementos do sistema, que dados guardam,
@@ -83,9 +83,9 @@ PROBLEMA 2 - Diagrama de Casos de Uso: <<extend>> usado em uma validação obrig
 Outros problemas encontrados (detalhados em final/Pontos-Correção-dos-Códigos.md): login e cadastro de usuários
 inexistentes; notificação automática (só existe como hipótese do experimento);
 editar, excluir e cancelar aceite (nenhuma história pede); proximidade/endereço (RN4
-fora do escopo); histórias adiadas (H3, H5) desenhadas como implementadas; atributos
+fora do escopo); histórias pendentes (H4, H5) desenhadas como implementadas; atributos
 da Doação diferentes do schema (quantidade double em vez de int, faltando unidade e
-criada_em); status VENCIDA, COLETADA e CANCELADA inexistentes; serviço acessando o
+criada_em); status VENCIDA e CANCELADA inexistentes; serviço acessando o
 SQLite direto, pulando o repositório e o db.js.
 
 

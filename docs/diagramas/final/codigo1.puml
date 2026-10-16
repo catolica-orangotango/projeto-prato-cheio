@@ -4,9 +4,9 @@ left to right direction
 title Prato Cheio - Diagrama de Casos de Uso (versão final)
 
 skinparam usecase {
-  BackgroundColor<<U2>> #F2F2F2
-  BorderColor<<U2>> #999999
-  FontColor<<U2>> #777777
+  BackgroundColor<<pendente>> #F2F2F2
+  BorderColor<<pendente>> #999999
+  FontColor<<pendente>> #777777
 }
 
 actor "Doador\n(restaurante, padaria, mercado)" as Doador
@@ -19,18 +19,20 @@ rectangle "Prato Cheio" {
   usecase "Publicar doação\n(H1)" as UC1
   usecase "Ver doações disponíveis\n(H2)" as UC2
   usecase "Aceitar doação\n(H2)" as UC3
+  usecase "Ver doações aguardando\nretirada (H3)" as UC4
+  usecase "Confirmar retirada\n(H3)" as UC5
 
-  usecase "Confirmar coleta\n(H3)" as UC4 <<U2>>
-  usecase "Consultar volume coletado\n(H4)" as UC5 <<U2>>
-  usecase "Consultar perecíveis da ONG\n(H5, ainda a fatiar)" as UC6 <<U2>>
+  usecase "Consultar volume coletado\n(H4)" as UC6 <<pendente>>
+  usecase "Consultar perecíveis da ONG\n(H5, ainda a fatiar)" as UC7 <<pendente>>
 }
 
 Doador -- UC1
 ONG -- UC2
 ONG -- UC3
 Entregador -- UC4
-Coord -- UC5
-Vig -- UC6
+Entregador -- UC5
+Coord -- UC6
+Vig -- UC7
 
 note right of UC1
   RN1: tipo, quantidade (inteiro > 0),
@@ -51,8 +53,14 @@ note right of UC3
   livre: não há login.
 end note
 
+note right of UC5
+  Só doação 'aceita' pode ser coletada,
+  e uma única vez (CA 3.2, CA 3.3).
+  Grava coletada_em (CA 3.1).
+end note
+
 legend right
-  Casos de uso cinzas (<<U2>>): levantados na análise,
-  adiados para a Unidade 2. Não existem no sistema hoje.
+  Casos de uso cinzas (<<pendente>>): levantados na análise,
+  ainda não implementados. Não existem no sistema hoje.
 endlegend
 @enduml

@@ -9,14 +9,18 @@ class "app.js" as app <<módulo: rotas HTTP>> {
   .. rotas ..
   GET /api/saude
   GET /api/doacoes
+  GET /api/doacoes/aceitas
   POST /api/doacoes
   POST /api/doacoes/:id/aceitar
+  POST /api/doacoes/:id/coletar
 }
 
 class "doacoes.js" as regras <<módulo: regras de negócio>> {
   +criarDoacao(dados): Doacao
   +listarDisponiveis(): Doacao[]
   +aceitar(id, ong): Doacao
+  +listarAceitas(): Doacao[]
+  +coletar(id): Doacao
 }
 
 class "repositorio.js" as repo <<módulo: acesso a dados>> {
@@ -24,6 +28,8 @@ class "repositorio.js" as repo <<módulo: acesso a dados>> {
   +listarDisponiveis(): Doacao[]
   +buscarPorId(id): Doacao
   +aceitar(id, ong): Doacao
+  +listarAceitas(): Doacao[]
+  +coletar(id): Doacao
 }
 
 class "db.js" as db <<módulo: conexão SQLite>> {
@@ -43,11 +49,14 @@ class Doacao <<tabela doacoes>> {
   +status: StatusDoacao
   +ong: string [0..1]
   +criada_em: datetime
+  +aceita_em: datetime [0..1]
+  +coletada_em: datetime [0..1]
 }
 
 enum StatusDoacao {
   disponivel
   aceita
+  coletada
 }
 
 app ..> regras : chama
@@ -60,17 +69,20 @@ Doacao --> "1" StatusDoacao : status
 note bottom of Doacao
   "ong" é texto livre: vazio até o aceite
   e gravado uma única vez (RN3).
-  Não existe entidade ONG nem Doador:
-  não há cadastro nem login.
+  Não existe entidade ONG, Doador nem
+  Entregador: não há cadastro nem login.
 end note
 
 note top of regras
   RN1 em criarDoacao()
   RN3 em aceitar()
+  H3 em coletar(): recusa doação
+  ainda 'disponivel'
 end note
 
 note bottom of repo
   RN2 no WHERE de listarDisponiveis()
-  Trava da RN3 no WHERE de aceitar()
+  Trava da RN3: WHERE status = 'disponivel'
+  Trava da coleta: WHERE status = 'aceita'
 end note
 @enduml
