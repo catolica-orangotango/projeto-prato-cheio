@@ -11,7 +11,7 @@
 |---|---|---|
 
 ## Diagramas
-(contexto + dados ou componentes — em `docs/` ou como imagem)
+Diagramas UML de **Casos de Uso** e de **Classes** (PlantUML), com versão original da IA, pontos de correção e versão final: ver [`docs/diagramas/`](diagramas/) (comece por `ENTREGA.txt`).
 
 ## ADRs
 Ver `docs/adr/`.

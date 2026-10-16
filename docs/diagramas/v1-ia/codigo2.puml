@@ -1,0 +1,92 @@
+@startuml classes-v1
+!pragma layout smetana
+title Prato Cheio - Diagrama de Classes (v1 gerada pela IA)
+
+abstract class Usuario {
+  +id: int
+  +nome: String
+  +email: String
+  +senha: String
+  +login(): boolean
+}
+
+class Doador {
+  +cnpj: String
+  +endereco: Endereco
+  +publicarDoacao(d: Doacao)
+  +editarDoacao(d: Doacao)
+  +excluirDoacao(d: Doacao)
+}
+
+class ONG {
+  +cnpj: String
+  +endereco: Endereco
+  +raioAtuacaoKm: double
+  +aceitarDoacao(d: Doacao)
+  +cancelarAceite(d: Doacao)
+}
+
+class Entregador {
+  +cnh: String
+  +veiculo: String
+  +confirmarColeta(d: Doacao)
+}
+
+class Endereco {
+  +rua: String
+  +numero: String
+  +bairro: String
+  +latitude: double
+  +longitude: double
+  +calcularDistancia(outro: Endereco): double
+}
+
+class Doacao {
+  +id: int
+  +descricao: String
+  +quantidade: double
+  +validade: String
+  +status: StatusDoacao
+  +foto: Blob
+  +aceitar(ong: ONG)
+  +vencer()
+}
+
+enum StatusDoacao {
+  DISPONIVEL
+  ACEITA
+  VENCIDA
+  COLETADA
+  CANCELADA
+}
+
+class DoacaoService {
+  +criar(d: Doacao)
+  +listar(): List<Doacao>
+  +aceitar(id: int, ong: ONG)
+}
+
+class Notificacao {
+  +id: int
+  +mensagem: String
+  +dataEnvio: DateTime
+  +enviar()
+}
+
+class SQLiteDatabase {
+  +executar(sql: String)
+}
+
+Usuario <|-- Doador
+Usuario <|-- ONG
+Usuario <|-- Entregador
+Doador "1" --> "*" Doacao : publica
+Doacao "*" -- "*" ONG : aceita
+Entregador "1" -- "*" Doacao : coleta
+Doador --> Endereco
+ONG --> Endereco
+Doacao --> StatusDoacao
+DoacaoService ..> SQLiteDatabase : usa
+DoacaoService ..> Notificacao : dispara
+Notificacao "*" --> "1" Usuario : destinatário
+@enduml

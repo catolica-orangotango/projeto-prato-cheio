@@ -1,0 +1,142 @@
+PRATO CHEIO - ENTREGA N2 (PROJETO): DIAGRAMAS COM APOIO DE IA
+================================================================
+
+Grupo:
+  - Gustavo Vinicius Taques (@gustavotaques)
+  - João Pedro Angélico (@joaopedroangelico)
+  - Luis Fernando Pereira (@Luis-Fernando-Pereira)
+  - Vynicyus Candido (@VynicyusCandido)
+
+
+1. LINK DO REPOSITÓRIO E DO PULL REQUEST
+----------------------------------------
+Repositório:   https://github.com/catolica-orangotango/projeto-prato-cheio
+Pull Request:  https://github.com/catolica-orangotango/projeto-prato-cheio/pull/27
+Branch:        docs/diagramas
+
+
+2. DIAGRAMAS ESCOLHIDOS E JUSTIFICATIVA
+---------------------------------------
+a) Diagrama de Casos de Uso (UML)
+   Pergunta que responde: quem usa o sistema e para quê? O que já existe e o que
+   ainda é só plano?
+   Justificativa: o caso tem 5 histórias e 5 papéis diferentes (doador, funcionário
+   de ONG, entregador, coordenador, vigilância sanitária), mas só H1, H2 e H3 estão
+   implementadas. O diagrama mostra o escopo real e separa o que ainda está pendente
+   (H4, H5), ligando cada caso de uso à sua história (H1 a H5) e às regras de
+   negócio (RN1 a RN3).
+
+b) Diagrama de Classes (UML)
+   Pergunta que responde: quais são os elementos do sistema, que dados guardam,
+   quais responsabilidades têm e como dependem uns dos outros?
+   Justificativa: mostra a estrutura de dados real (tabela doacoes) e a divisão em
+   camadas (app.js -> doacoes.js -> repositorio.js -> db.js). É nas multiplicidades
+   e atributos que a RN3 ("uma doação, uma ONG") e a rastreabilidade (criada_em)
+   aparecem. A divisão em camadas sustenta a decisão de migrar para PostgreSQL na
+   U3 mexendo só no db.js.
+
+Os dois respondem a perguntas diferentes: o de casos de uso olha o sistema de fora
+(atores e objetivos); o de classes olha por dentro (dados e responsabilidades).
+
+
+3. VERSÕES INICIAIS PRODUZIDAS PELA IA (sem correção)
+-----------------------------------------------------
+  - docs/diagramas/v1-ia/codigo1.puml   (Casos de Uso)
+  - docs/diagramas/v1-ia/codigo2.puml   (Classes)
+
+
+4. PROBLEMAS IDENTIFICADOS (com justificativa e correção)
+---------------------------------------------------------
+A lista completa, com 12 problemas e a linha exata de cada um, está em:
+docs/diagramas/final/Pontos-Correção-dos-Códigos.md
+Abaixo, os dois problemas principais.
+
+PROBLEMA 1 - Diagrama de Classes: multiplicidade muitos-para-muitos entre Doação e ONG
+  Onde:          v1-ia/codigo2.puml, linha 84 ->  Doacao "*" -- "*" ONG : aceita
+  Problema:      a IA modelou a relação de aceite como muitos-para-muitos, ou seja,
+                 uma mesma doação poderia ser aceita por várias ONGs.
+  Justificativa: isso viola a RN3 ("uma doação aceita não fica disponível para outra
+                 ONG"). No sistema real, "ong" é uma única coluna, anulável, da tabela
+                 doacoes (src/db.js), gravada uma única vez pelo
+                 UPDATE ... WHERE status = 'disponivel' (src/repositorio.js). Um "*"
+                 errado no modelo desfaz a principal garantia do sistema.
+  Correção:      a relação virou o atributo "ong: string [0..1]" na Doacao: nenhuma
+                 ONG até o aceite e no máximo uma depois. A classe ONG foi removida,
+                 porque não existe cadastro de ONG (o nome chega como texto livre). Se
+                 a U2 criar a entidade, a associação correta será
+                 Doacao "*" --> "0..1" ONG.
+
+PROBLEMA 2 - Diagrama de Casos de Uso: <<extend>> usado em uma validação obrigatória
+  Onde:          v1-ia/codigo1.puml, linhas 19 e 47
+                 ->  "Validar dados da doação" ..> "Publicar doação" : <<extend>>
+  Problema:      a IA criou "Validar dados da doação" como caso de uso separado e o
+                 ligou a "Publicar doação" com <<extend>>.
+  Justificativa: há dois erros de notação UML. (1) <<extend>> indica comportamento
+                 OPCIONAL, que só acontece sob certa condição, mas a validação da RN1
+                 acontece SEMPRE (função criarDoacao() em src/doacoes.js). (2) Validar
+                 não é um objetivo do ator: nenhum doador entra no sistema "para
+                 validar dados". É uma regra interna da publicação.
+  Correção:      o caso de uso foi removido e a RN1 virou uma nota presa a
+                 "Publicar doação" (tipo, quantidade inteira > 0, unidade e validade
+                 hoje ou futura; se for inválido, recusa com erro 400 e nada é gravado).
+
+Outros problemas encontrados (detalhados em final/Pontos-Correção-dos-Códigos.md): login e cadastro de usuários
+inexistentes; notificação automática (só existe como hipótese do experimento);
+editar, excluir e cancelar aceite (nenhuma história pede); proximidade/endereço (RN4
+fora do escopo); histórias pendentes (H4, H5) desenhadas como implementadas; atributos
+da Doação diferentes do schema (quantidade double em vez de int, faltando unidade e
+criada_em); status VENCIDA e CANCELADA inexistentes; serviço acessando o
+SQLite direto, pulando o repositório e o db.js.
+
+
+5. VERSÕES FINAIS (em docs/)
+----------------------------
+  - docs/diagramas/final/codigo1.puml   (Casos de Uso)
+  - docs/diagramas/final/codigo2.puml   (Classes)
+
+
+6. FERRAMENTA DE IA UTILIZADA
+-----------------------------
+Claude (Anthropic), modelo Claude Opus 5.5, usado pelo Claude Code (extensão do VS Code).
+Ferramenta de diagrama: PlantUML (.puml) nos dois diagramas. Escolhido porque o Mermaid
+não tem diagrama de casos de uso. É texto, editável e versionado no Git.
+
+
+7. COMMITS DE CADA MEMBRO
+-------------------------
+Cada integrante fez ao menos um commit no branch docs/diagramas (conferir em
+"Commits" no Pull Request):
+  - Gustavo Vinicius Taques ..... ____________________________  (PREENCHER)
+  - João Pedro Angélico ......... ____________________________  (PREENCHER)
+  - Luis Fernando Pereira ....... ____________________________  (PREENCHER)
+  - Vynicyus Candido ............ ____________________________  (PREENCHER)
+Cada integrante também fez sua própria entrega no Teams.
+
+
+8. COMO O PROFESSOR ENCONTRA A RESPOSTA NO REPOSITÓRIO
+------------------------------------------------------
+Tudo está na pasta:  docs/diagramas/
+  |-- ENTREGA.txt                       <- este arquivo (resumo da entrega)
+  |-- v1-ia/                            <- versões ORIGINAIS da IA
+  |   |-- codigo1.puml                  (Casos de Uso)
+  |   |-- codigo2.puml                  (Classes)
+  |-- final/                            <- versões FINAIS corrigidas
+      |-- codigo1.puml                  (Casos de Uso)
+      |-- codigo2.puml                  (Classes)
+      |-- Pontos-Correção-dos-Códigos.md  <- todos os problemas, linha a linha
+
+O docs/projeto.md (seção "Diagramas") também aponta para essa pasta.
+Para ver as imagens, cole o código .puml em https://www.plantuml.com/plantuml
+ou use a extensão PlantUML do VS Code.
+
+
+REFLEXÃO FINAL
+--------------
+Qual dos dois diagramas foi mais útil para compreender ou questionar uma decisão?
+
+O diagrama de classes. Ao corrigir a multiplicidade "*" -- "*" entre Doação e ONG,
+tivemos de explicar onde a RN3 está garantida de fato: na coluna única "ong" e na
+trava do UPDATE, e não em uma classe ONG. Isso também mostrou que o sistema não
+identifica a ONG de forma confiável (é texto livre, sem login), o que vai afetar a
+H4 (relatório por ONG) na Unidade 2. O diagrama de casos de uso foi mais útil para
+delimitar o escopo, mas não chegou a questionar nenhuma decisão técnica.
