@@ -1,5 +1,7 @@
 # Prato Cheio: pontos de correção dos códigos
 
+Pull Request da entrega: <https://github.com/catolica-orangotango/projeto-prato-cheio/pull/27>
+
 | Arquivo | Diagrama | Versão da IA (sem correção) | Versão final (corrigida) |
 |---|---|---|---|
 | `codigo1.puml` | Casos de Uso (UML) | [`v1-ia/codigo1.puml`](../v1-ia/codigo1.puml) | [`final/codigo1.puml`](codigo1.puml) |

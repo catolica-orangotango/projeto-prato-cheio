@@ -11,7 +11,7 @@ Grupo:
 1. LINK DO REPOSITÓRIO E DO PULL REQUEST
 ----------------------------------------
 Repositório:   https://github.com/catolica-orangotango/projeto-prato-cheio
-Pull Request:  https://github.com/catolica-orangotango/projeto-prato-cheio/pull/__  (PREENCHER)
+Pull Request:  https://github.com/catolica-orangotango/projeto-prato-cheio/pull/27
 Branch:        docs/diagramas
 
 
