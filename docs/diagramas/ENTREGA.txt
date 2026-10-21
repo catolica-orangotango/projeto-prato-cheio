@@ -41,8 +41,8 @@ Os dois respondem a perguntas diferentes: o de casos de uso olha o sistema de fo
 
 3. VERSÕES INICIAIS PRODUZIDAS PELA IA (sem correção)
 -----------------------------------------------------
-  - docs/diagramas/v1-ia/codigo1.puml   (Casos de Uso)
-  - docs/diagramas/v1-ia/codigo2.puml   (Classes)
+  - docs/diagramas/v1-ia/versao-ia1.puml   (Casos de Uso)
+  - docs/diagramas/v1-ia/versao-ia2.puml   (Classes)
 
 
 4. PROBLEMAS IDENTIFICADOS (com justificativa e correção)
@@ -52,7 +52,7 @@ docs/diagramas/final/Pontos-Correção-dos-Códigos.md
 Abaixo, os dois problemas principais.
 
 PROBLEMA 1 - Diagrama de Classes: multiplicidade muitos-para-muitos entre Doação e ONG
-  Onde:          v1-ia/codigo2.puml, linha 84 ->  Doacao "*" -- "*" ONG : aceita
+  Onde:          v1-ia/versao-ia2.puml, linha 84 ->  Doacao "*" -- "*" ONG : aceita
   Problema:      a IA modelou a relação de aceite como muitos-para-muitos, ou seja,
                  uma mesma doação poderia ser aceita por várias ONGs.
   Justificativa: isso viola a RN3 ("uma doação aceita não fica disponível para outra
@@ -67,7 +67,7 @@ PROBLEMA 1 - Diagrama de Classes: multiplicidade muitos-para-muitos entre Doaç�
                  Doacao "*" --> "0..1" ONG.
 
 PROBLEMA 2 - Diagrama de Casos de Uso: <<extend>> usado em uma validação obrigatória
-  Onde:          v1-ia/codigo1.puml, linhas 19 e 47
+  Onde:          v1-ia/versao-ia1.puml, linhas 19 e 47
                  ->  "Validar dados da doação" ..> "Publicar doação" : <<extend>>
   Problema:      a IA criou "Validar dados da doação" como caso de uso separado e o
                  ligou a "Publicar doação" com <<extend>>.
@@ -91,8 +91,8 @@ SQLite direto, pulando o repositório e o db.js.
 
 5. VERSÕES FINAIS (em docs/)
 ----------------------------
-  - docs/diagramas/final/codigo1.puml   (Casos de Uso)
-  - docs/diagramas/final/codigo2.puml   (Classes)
+  - docs/diagramas/final/vf-ia1.puml   (Casos de Uso)
+  - docs/diagramas/final/vf-ia2.puml   (Classes)
 
 
 6. FERRAMENTA DE IA UTILIZADA
@@ -118,11 +118,11 @@ Cada integrante também fez sua própria entrega no Teams.
 Tudo está na pasta:  docs/diagramas/
   |-- ENTREGA.txt                       <- este arquivo (resumo da entrega)
   |-- v1-ia/                            <- versões ORIGINAIS da IA
-  |   |-- codigo1.puml                  (Casos de Uso)
-  |   |-- codigo2.puml                  (Classes)
+  |   |-- versao-ia1.puml               (Casos de Uso)
+  |   |-- versao-ia2.puml               (Classes)
   |-- final/                            <- versões FINAIS corrigidas
-      |-- codigo1.puml                  (Casos de Uso)
-      |-- codigo2.puml                  (Classes)
+      |-- vf-ia1.puml                   (Casos de Uso)
+      |-- vf-ia2.puml                   (Classes)
       |-- Pontos-Correção-dos-Códigos.md  <- todos os problemas, linha a linha
 
 O docs/projeto.md (seção "Diagramas") também aponta para essa pasta.
