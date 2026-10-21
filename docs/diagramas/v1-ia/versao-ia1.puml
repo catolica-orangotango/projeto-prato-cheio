@@ -1,0 +1,51 @@
+@startuml casos-de-uso-v1
+!pragma layout smetana
+left to right direction
+title Prato Cheio - Diagrama de Casos de Uso (v1 gerada pela IA)
+
+actor Doador
+actor ONG
+actor Entregador
+actor "Administrador\n(Marta)" as Admin
+actor "Vigilância Sanitária" as Vig
+actor "Sistema de Notificação" as Notif
+
+rectangle "Prato Cheio" {
+  usecase "Fazer login" as UC_Login
+  usecase "Cadastrar conta" as UC_Cad
+  usecase "Publicar doação" as UC_Pub
+  usecase "Editar doação" as UC_Edit
+  usecase "Excluir doação" as UC_Del
+  usecase "Validar dados da doação" as UC_Val
+  usecase "Ver doações disponíveis" as UC_Ver
+  usecase "Filtrar doações por proximidade" as UC_Prox
+  usecase "Aceitar doação" as UC_Aceitar
+  usecase "Cancelar aceite" as UC_Cancel
+  usecase "Notificar ONGs" as UC_Notif
+  usecase "Confirmar coleta" as UC_Coleta
+  usecase "Gerenciar ONGs" as UC_GerONG
+  usecase "Gerar relatório de volume" as UC_Rel
+  usecase "Consultar estoque da ONG" as UC_Est
+}
+
+Doador --> UC_Cad
+Doador --> UC_Pub
+Doador --> UC_Edit
+Doador --> UC_Del
+ONG --> UC_Ver
+ONG --> UC_Aceitar
+ONG --> UC_Cancel
+ONG --> UC_Prox
+Entregador --> UC_Coleta
+Admin --> UC_GerONG
+Admin --> UC_Rel
+Vig --> UC_Est
+UC_Notif --> Notif
+
+UC_Pub ..> UC_Login : <<include>>
+UC_Aceitar ..> UC_Login : <<include>>
+UC_Val ..> UC_Pub : <<extend>>
+UC_Ver ..> UC_Aceitar : <<include>>
+UC_Pub ..> UC_Notif : <<include>>
+UC_Aceitar ..> UC_Notif : <<include>>
+@enduml
