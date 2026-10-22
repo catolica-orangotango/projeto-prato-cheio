@@ -366,6 +366,15 @@ describe('total de doações coletadas no período', () => {
     expect(res.body.total).toBe(2);
   });
 
+  // CA 4.3: o nome da ONG é o mesmo no aceite e na consulta, mesmo com espaços nas pontas
+  it('conta a coleta de uma ONG aceita com espaços extras no nome', async () => {
+    await coletada('  Casa da Sopa ', '2026-10-05 10:00:00');
+
+    const res = await consultar({ ong: 'Casa da Sopa', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.body.total).toBe(1);
+  });
+
   // CA 4.4: só conta o que foi retirado
   it('não conta doações aceitas que ainda não foram coletadas', async () => {
     await coletada('Casa da Sopa');

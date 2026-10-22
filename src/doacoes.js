@@ -51,7 +51,8 @@ export async function aceitar(id, ong) {
     throw new Error('doação não encontrada');
   }
 
-  const aceita = await repo.aceitar(id, ong);
+  // Grava o nome sem espaços nas pontas, igual à consulta da história 4.
+  const aceita = await repo.aceitar(id, String(ong).trim());
   if (!aceita) {
     throw new Error('doação já foi aceita por outra ONG');
   }
