@@ -51,6 +51,9 @@
       font-weight: bold;
     }
     button:hover { background: var(--azul-escuro); }
+    button:disabled { opacity: .6; cursor: wait; }
+    .aviso { margin: .5rem 0; color: var(--azul-escuro); }
+    .aviso.erro { color: #a40000; font-weight: bold; }
     li {
       border: 1px solid #ddd;
       border-left: 4px solid var(--azul);
@@ -80,12 +83,15 @@
       <label for="validade">Validade / retirar até</label>
       <input id="validade" type="date">
       <button id="publicar">Publicar</button>
+      <p id="publicar-aviso" class="aviso" aria-live="polite"></p>
     </fieldset>
 
     <h2>Doações disponíveis</h2>
+    <p id="lista-aviso" class="aviso" aria-live="polite"></p>
     <ul id="lista"></ul>
 
     <h2>Aguardando retirada</h2>
+    <p id="aceitas-aviso" class="aviso" aria-live="polite"></p>
     <ul id="aceitas"></ul>
 
     <h2>Doações coletadas no período</h2>
@@ -113,6 +119,28 @@
   </main>
 
   <script>
+    // Envia uma ação ao servidor e devolve o motivo da recusa, ou null se deu certo.
+    // O botão fica desabilitado durante o pedido para não enviar duas vezes.
+    async function enviar(botao, url, opcoes) {
+      botao.disabled = true;
+      try {
+        const res = await fetch(url, opcoes);
+        if (res.ok) return null;
+        const corpo = await res.json().catch(() => ({}));
+        return corpo.erro ?? `erro ${res.status}`;
+      } catch {
+        return 'não foi possível falar com o servidor';
+      } finally {
+        botao.disabled = false;
+      }
+    }
+
+    function avisar(id, texto, erro) {
+      const aviso = document.getElementById(id);
+      aviso.textContent = texto;
+      aviso.classList.toggle('erro', erro);
+    }
+
     async function carregar() {
       const res = await fetch('/api/doacoes');
       const doacoes = await res.json();
@@ -126,11 +154,12 @@
         const botao = document.createElement('button');
         botao.textContent = 'Aceitar';
         botao.onclick = async () => {
-          await fetch(`/api/doacoes/${d.id}/aceitar`, {
+          const erro = await enviar(botao, `/api/doacoes/${d.id}/aceitar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ong: 'Minha ONG' })
           });
+          avisar('lista-aviso', erro ? `Não foi possível aceitar: ${erro}.` : `Doação aceita: ${d.tipo}.`, Boolean(erro));
           carregar();
         };
         li.appendChild(botao);
@@ -153,7 +182,8 @@
         const botao = document.createElement('button');
         botao.textContent = 'Confirmar retirada';
         botao.onclick = async () => {
-          await fetch(`/api/doacoes/${d.id}/coletar`, { method: 'POST' });
+          const erro = await enviar(botao, `/api/doacoes/${d.id}/coletar`, { method: 'POST' });
+          avisar('aceitas-aviso', erro ? `Não foi possível confirmar a retirada: ${erro}.` : `Retirada confirmada: ${d.tipo}.`, Boolean(erro));
           carregarAceitas();
         };
         li.appendChild(botao);
@@ -161,17 +191,26 @@
       }
     }
 
-    document.getElementById('publicar').onclick = async () => {
-      await fetch('/api/doacoes', {
+    // CA 1.2: se a publicação for recusada, informa o motivo e mantém os campos preenchidos.
+    document.getElementById('publicar').onclick = async (evento) => {
+      const campos = ['tipo', 'quantidade', 'unidade', 'validade'].map((id) => document.getElementById(id));
+      const [tipo, quantidade, unidade, validade] = campos;
+      const erro = await enviar(evento.currentTarget, '/api/doacoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tipo: document.getElementById('tipo').value,
-          quantidade: Number(document.getElementById('quantidade').value),
-          unidade: document.getElementById('unidade').value,
-          validade: document.getElementById('validade').value
+          tipo: tipo.value,
+          quantidade: Number(quantidade.value),
+          unidade: unidade.value,
+          validade: validade.value
         })
       });
+      if (erro) {
+        avisar('publicar-aviso', `Não foi possível publicar: ${erro}.`, true);
+        return;
+      }
+      avisar('publicar-aviso', 'Doação publicada.', false);
+      for (const campo of campos) campo.value = '';
       carregar();
     };
 
