@@ -375,6 +375,15 @@ describe('total de doações coletadas no período', () => {
     expect(res.body.total).toBe(1);
   });
 
+  it('ignora espaços nas pontas do nome da ONG na consulta', async () => {
+    await coletada('Casa da Sopa', '2026-10-05 10:00:00');
+
+    const res = await consultar({ ong: '  Casa da Sopa ', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.body.total).toBe(1);
+    expect(res.body.ong).toBe('Casa da Sopa');
+  });
+
   // CA 4.4: só conta o que foi retirado
   it('não conta doações aceitas que ainda não foram coletadas', async () => {
     await coletada('Casa da Sopa');
@@ -389,6 +398,13 @@ describe('total de doações coletadas no período', () => {
   // CA 4.5: consulta inválida é recusada
   it('recusa a consulta sem a ONG', async () => {
     const res = await consultar({ inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/ONG/);
+  });
+
+  it('recusa a consulta com o nome da ONG só de espaços', async () => {
+    const res = await consultar({ ong: '   ', inicio: '2026-10-01', fim: '2026-10-31' });
 
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/ONG/);
