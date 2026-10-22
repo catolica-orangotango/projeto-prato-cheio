@@ -84,10 +84,23 @@
 
     <h2>Doações disponíveis</h2>
     <ul id="lista"></ul>
-  </main>
 
-  <h2>Aguardando retirada</h2>
-  <ul id="aceitas"></ul>
+    <h2>Aguardando retirada</h2>
+    <ul id="aceitas"></ul>
+
+    <h2>Doações coletadas no período</h2>
+    <fieldset>
+      <legend>Consultar total da ONG</legend>
+      <label for="relatorio-ong">ONG</label>
+      <input id="relatorio-ong" value="Minha ONG">
+      <label for="relatorio-inicio">De</label>
+      <input id="relatorio-inicio" type="date">
+      <label for="relatorio-fim">Até</label>
+      <input id="relatorio-fim" type="date">
+      <button id="consultar">Consultar</button>
+      <p id="relatorio-resultado" aria-live="polite"></p>
+    </fieldset>
+  </main>
 
   <script>
     async function carregar() {
@@ -150,6 +163,20 @@
         })
       });
       carregar();
+    };
+
+    // História 4: o coordenador consulta quantas doações a ONG coletou no período.
+    document.getElementById('consultar').onclick = async () => {
+      const params = new URLSearchParams({
+        ong: document.getElementById('relatorio-ong').value,
+        inicio: document.getElementById('relatorio-inicio').value,
+        fim: document.getElementById('relatorio-fim').value
+      });
+      const res = await fetch(`/api/relatorios/coletas?${params}`);
+      const corpo = await res.json();
+      document.getElementById('relatorio-resultado').textContent = res.ok
+        ? `${corpo.ong} coletou ${corpo.total} doação(ões) de ${corpo.inicio} a ${corpo.fim}.`
+        : `Não foi possível consultar: ${corpo.erro}.`;
     };
 
     carregar();

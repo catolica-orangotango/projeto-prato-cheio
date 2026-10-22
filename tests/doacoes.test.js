@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import { criarApp } from '../src/app.js';
-import { migrar, limparBanco, encerrar } from '../src/db.js';
+import { migrar, limparBanco, encerrar, query } from '../src/db.js';
 import * as repo from '../src/repositorio.js';
 
 const app = criarApp();
@@ -308,6 +308,134 @@ describe('confirmar a retirada de uma doação', () => {
 });
 
 // ---------------------------------------------------------------------------
+// História 4: o coordenador da ONG consulta quantas doações coletou num período.
+// ---------------------------------------------------------------------------
+describe('total de doações coletadas no período', () => {
+  beforeEach(async () => {
+    await migrar();
+    await limparBanco();
+  });
+  afterAll(async () => {
+    await encerrar();
+  });
+
+  // Publica, aceita pela ONG e confirma a retirada. Com `em`, reescreve a
+  // data/hora da coleta para simular uma retirada feita em outro dia.
+  async function coletada(ong, em) {
+    const { body: doacao } = await request(app).post('/api/doacoes').send(doacaoValida());
+    await request(app).post(`/api/doacoes/${doacao.id}/aceitar`).send({ ong });
+    await request(app).post(`/api/doacoes/${doacao.id}/coletar`);
+    if (em) await query('UPDATE doacoes SET coletada_em = ? WHERE id = ?', [em, doacao.id]);
+    return doacao;
+  }
+
+  const consultar = (params) => request(app).get('/api/relatorios/coletas').query(params);
+
+  // CA 4.1: contagem por período, com início e fim inclusivos
+  it('conta as coletas da ONG dentro do período, incluindo o primeiro e o último dia', async () => {
+    await coletada('Casa da Sopa', '2026-09-30 23:59:59'); // antes do período
+    await coletada('Casa da Sopa', '2026-10-01 00:00:00'); // primeiro dia
+    await coletada('Casa da Sopa', '2026-10-05 14:30:00');
+    await coletada('Casa da Sopa', '2026-10-10 23:59:59'); // último dia
+    await coletada('Casa da Sopa', '2026-10-11 00:00:00'); // depois do período
+
+    const res = await consultar({ ong: 'Casa da Sopa', inicio: '2026-10-01', fim: '2026-10-10' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ong: 'Casa da Sopa', inicio: '2026-10-01', fim: '2026-10-10', total: 3 });
+  });
+
+  // CA 4.2: período sem coletas
+  it('retorna zero, sem erro, quando a ONG não coletou nada no período', async () => {
+    await coletada('Casa da Sopa', '2026-10-05 10:00:00');
+
+    const res = await consultar({ ong: 'Casa da Sopa', inicio: '2026-11-01', fim: '2026-11-30' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(0);
+  });
+
+  // CA 4.3: recorte por ONG
+  it('conta só as coletas da ONG consultada', async () => {
+    await coletada('ONG A', '2026-10-05 10:00:00');
+    await coletada('ONG A', '2026-10-06 10:00:00');
+    await coletada('ONG B', '2026-10-05 11:00:00');
+
+    const res = await consultar({ ong: 'ONG A', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.body.total).toBe(2);
+  });
+
+  // CA 4.3: o nome da ONG é o mesmo no aceite e na consulta, mesmo com espaços nas pontas
+  it('conta a coleta de uma ONG aceita com espaços extras no nome', async () => {
+    await coletada('  Casa da Sopa ', '2026-10-05 10:00:00');
+
+    const res = await consultar({ ong: 'Casa da Sopa', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.body.total).toBe(1);
+  });
+
+  it('ignora espaços nas pontas do nome da ONG na consulta', async () => {
+    await coletada('Casa da Sopa', '2026-10-05 10:00:00');
+
+    const res = await consultar({ ong: '  Casa da Sopa ', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.body.total).toBe(1);
+    expect(res.body.ong).toBe('Casa da Sopa');
+  });
+
+  // CA 4.4: só conta o que foi retirado
+  it('não conta doações aceitas que ainda não foram coletadas', async () => {
+    await coletada('Casa da Sopa');
+    const { body: pendente } = await request(app).post('/api/doacoes').send(doacaoValida());
+    await request(app).post(`/api/doacoes/${pendente.id}/aceitar`).send({ ong: 'Casa da Sopa' });
+
+    const res = await consultar({ ong: 'Casa da Sopa', inicio: emDias(-1), fim: emDias(1) });
+
+    expect(res.body.total).toBe(1);
+  });
+
+  // CA 4.5: consulta inválida é recusada
+  it('recusa a consulta sem a ONG', async () => {
+    const res = await consultar({ inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/ONG/);
+  });
+
+  it('recusa a consulta com o nome da ONG só de espaços', async () => {
+    const res = await consultar({ ong: '   ', inicio: '2026-10-01', fim: '2026-10-31' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/ONG/);
+  });
+
+  it('recusa data fora do formato AAAA-MM-DD ou ausente', async () => {
+    const formato = await consultar({ ong: 'ONG A', inicio: '01/10/2026', fim: '2026-10-31' });
+    expect(formato.status).toBe(400);
+    expect(formato.body.erro).toMatch(/início inválido/i);
+
+    const semFim = await consultar({ ong: 'ONG A', inicio: '2026-10-01' });
+    expect(semFim.status).toBe(400);
+    expect(semFim.body.erro).toMatch(/fim inválido/i);
+  });
+
+  it('recusa data que não existe no calendário', async () => {
+    const res = await consultar({ ong: 'ONG A', inicio: '2026-02-31', fim: '2026-10-31' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/início inválido/i);
+  });
+
+  it('recusa período com início depois do fim', async () => {
+    const res = await consultar({ ong: 'ONG A', inicio: '2026-10-31', fim: '2026-10-01' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/início é depois do fim/i);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Cobertura adicional de validação (RN1): casos de borda que ainda não tinham
 // teste próprio, mas já são tratados pelo código em src/doacoes.js.
 // ---------------------------------------------------------------------------
@@ -334,6 +462,15 @@ describe('validações adicionais de publicação', () => {
       .send(doacaoValida({ quantidade: 'abc' }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/quantidade/i);
+  });
+
+  it('recusa validade que não existe no calendário', async () => {
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ validade: '2099-02-31' }));
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/validade/i);
   });
 
   it('recusa validade fora do formato AAAA-MM-DD', async () => {

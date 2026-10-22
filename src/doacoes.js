@@ -5,6 +5,12 @@ const CAMPOS_OBRIGATORIOS = ['tipo', 'quantidade', 'unidade', 'validade'];
 
 const vazio = (valor) => valor === undefined || valor === null || String(valor).trim() === '';
 const hoje = () => new Date().toISOString().slice(0, 10);
+// Formato AAAA-MM-DD e dia que existe no calendário (recusa, por exemplo, 2026-02-31).
+const dataValida = (valor) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+  const data = new Date(`${valor}T00:00:00Z`);
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor;
+};
 
 // "Um doador publica uma doação."
 // Regra de negócio 1 (aula 2): tipo, quantidade, unidade e validade preenchidos;
@@ -22,7 +28,7 @@ export async function criarDoacao(dados = {}) {
   }
 
   const validade = String(dados.validade).trim();
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(validade) || Number.isNaN(Date.parse(validade))) {
+  if (!dataValida(validade)) {
     throw new Error('validade inválida: use o formato AAAA-MM-DD');
   }
   if (validade < hoje()) {
@@ -50,7 +56,8 @@ export async function aceitar(id, ong) {
     throw new Error('doação não encontrada');
   }
 
-  const aceita = await repo.aceitar(id, ong);
+  // Grava o nome sem espaços nas pontas, igual à consulta da história 4.
+  const aceita = await repo.aceitar(id, String(ong).trim());
   if (!aceita) {
     throw new Error('doação já foi aceita por outra ONG');
   }
@@ -78,4 +85,28 @@ export async function coletar(id) {
     throw new Error('doação já foi coletada');
   }
   return coletada;
+}
+
+// "O coordenador da ONG vê quantas doações coletou num período." (história 4)
+// Conta pela data da coleta, com início e fim inclusivos (ADR 0004).
+export async function totalColetadas({ ong, inicio, fim } = {}) {
+  if (vazio(ong)) {
+    throw new Error('informe a ONG');
+  }
+  const datas = { inicio: String(inicio ?? '').trim(), fim: String(fim ?? '').trim() };
+  for (const [campo, rotulo] of [
+    ['inicio', 'início'],
+    ['fim', 'fim'],
+  ]) {
+    if (!dataValida(datas[campo])) {
+      throw new Error(`${rotulo} inválido: use o formato AAAA-MM-DD`);
+    }
+  }
+  if (datas.inicio > datas.fim) {
+    throw new Error('período inválido: o início é depois do fim');
+  }
+
+  const nome = String(ong).trim();
+  const total = await repo.contarColetadas(nome, datas.inicio, datas.fim);
+  return { ong: nome, inicio: datas.inicio, fim: datas.fim, total };
 }
