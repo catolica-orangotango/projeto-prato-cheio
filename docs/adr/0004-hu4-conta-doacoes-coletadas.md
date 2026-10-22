@@ -15,7 +15,7 @@ Os critérios originais também deixavam em aberto se os dias de início e fim e
 ## Alternativas consideradas
 1. **Manter os critérios originais (aceitas, por `aceita_em`).** Prós: é o que o grupo acordou na aula 4, e nada muda nos docs. Contras: o número não responde à pergunta da história e infla o volume com doações que não foram retiradas.
 2. **Contar coletadas, por `coletada_em`.** Prós: responde à história e ao indicador da análise, e usa dados que a HU3 já grava. Contras: muda um critério acordado pelo grupo e depende da HU3 estar na `main` (já está).
-3. **Devolver os dois números (aceitas e coletadas).** Prós: mostra também a perda entre aceite e coleta. Contras: aumenta o escopo da história, e a métrica de perda pertence ao experimento da hipótese, não a esta história.
+3. **Devolver os dois números (aceitas e coletadas).** Prós: mostra também a perda entre aceite e coleta. Contras: aumenta o escopo da história, e a métrica de perda pertence ao experimento da hipótese, não a esta história. Pode virar uma história futura, se o grupo quiser medir essa perda.
 
 ## Decisão
 Alternativa 2. A história conta doações **coletadas** pela ONG, pela data de coleta (`coletada_em`). Junto com ela:
@@ -29,11 +29,11 @@ Os critérios completos (CA 4.1 a 4.5) estão na issue #5.
 
 ## Consequências
 - **Positivas:** o número que o coordenador vê é o volume que de fato saiu do doador. A história alimenta o indicador "doações coletadas por semana" sem trabalho extra.
-- **Negativas / o que abrimos mão:** o critério acordado em aula muda, e os docs da aula 4 e da análise passam a divergir da issue até serem atualizados. A taxa de aceite sem coleta não aparece para o coordenador.
-- **Riscos:** o grupo pode não concordar com a troca. Nesse caso, este ADR passa a "substituído" e a issue volta aos critérios originais. Coletas feitas fora do sistema (pelo WhatsApp) não têm `coletada_em` e não aparecem na contagem; o coordenador precisa saber que o total cobre só o que passou pela plataforma.
+- **Negativas / o que abrimos mão:** o critério acordado em aula muda. A `docs/analise.md` foi atualizada junto com este ADR, e a `docs/atividades/aula4.md` mantém o registro original da aula, com uma nota de revisão apontando para cá. A taxa de aceite sem coleta não aparece para o coordenador.
+- **Riscos:** Coletas feitas fora do sistema (pelo WhatsApp) não têm `coletada_em` e não aparecem na contagem; o coordenador precisa saber que o total cobre só o que passou pela plataforma.
 - **Limitação conhecida (fuso horário):** `coletada_em` é gravada em UTC (`datetime('now')`, desde a história 3) e a contagem compara o dia em UTC. Uma coleta feita no Brasil depois das 21h (UTC−3) conta no dia seguinte, o que pode mover coletas de borda entre períodos. Fica para resolver junto com a migração para PostgreSQL (ADR 0001), usando `timestamptz` e o fuso da ONG na consulta, em vez de um deslocamento fixo agora no SQLite.
 
 ## Rastreabilidade
-- História 4 e CA 4.1–4.3 em `docs/analise.md` e `docs/atividades/aula4.md`.
+- História 4 e CA 4.1 a 4.5 (versão vigente) em `docs/analise.md`. O registro original da aula, com os CA 4.1 a 4.3 antigos, está em `docs/atividades/aula4.md`.
 - Objetivo 2 da análise: "doações coletadas por semana".
 - Depende da história 3 (status `coletada` e `coletada_em`), PR #11.
