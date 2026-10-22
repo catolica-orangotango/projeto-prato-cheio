@@ -1,7 +1,7 @@
 # ADR 0005 — História 5 fatiada: "estoque" é o que a ONG coletou
 
 - **Data:** 2026-10-21
-- **Status:** proposto (aguarda confirmação do grupo)
+- **Status:** aceito (confirmado pelo grupo)
 
 ## Contexto
 A história 5 ([#4](https://github.com/catolica-orangotango/projeto-prato-cheio/issues/4)) diz: *"Como agente da vigilância sanitária, quero consultar todos os alimentos perecíveis que a ONG possui em estoque, para que eu possa realizar auditorias de qualidade"*. A Análise (`docs/analise.md`) já a marcou como mal fatiada: falha em **E**stimável e **S**mall, porque "estoque" pressupõe um inventário no tempo que o modelo não tem.
