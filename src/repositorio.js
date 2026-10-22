@@ -86,5 +86,6 @@ export async function contarColetadas(ong, inicio, fim) {
        AND date(coletada_em) BETWEEN ? AND ?`,
     [ong, inicio, fim],
   );
-  return rows[0].total;
+  // Number(): no PostgreSQL o COUNT(*) volta como bigint, que o driver entrega como texto.
+  return Number(rows[0].total);
 }

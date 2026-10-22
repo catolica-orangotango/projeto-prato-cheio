@@ -5,7 +5,12 @@ const CAMPOS_OBRIGATORIOS = ['tipo', 'quantidade', 'unidade', 'validade'];
 
 const vazio = (valor) => valor === undefined || valor === null || String(valor).trim() === '';
 const hoje = () => new Date().toISOString().slice(0, 10);
-const dataValida = (valor) => /^\d{4}-\d{2}-\d{2}$/.test(valor) && !Number.isNaN(Date.parse(valor));
+// Formato AAAA-MM-DD e dia que existe no calendário (recusa, por exemplo, 2026-02-31).
+const dataValida = (valor) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+  const data = new Date(`${valor}T00:00:00Z`);
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor;
+};
 
 // "Um doador publica uma doação."
 // Regra de negócio 1 (aula 2): tipo, quantidade, unidade e validade preenchidos;

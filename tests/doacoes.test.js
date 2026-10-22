@@ -404,6 +404,13 @@ describe('total de doações coletadas no período', () => {
     expect(semFim.body.erro).toMatch(/fim inválido/i);
   });
 
+  it('recusa data que não existe no calendário', async () => {
+    const res = await consultar({ ong: 'ONG A', inicio: '2026-02-31', fim: '2026-10-31' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/início inválido/i);
+  });
+
   it('recusa período com início depois do fim', async () => {
     const res = await consultar({ ong: 'ONG A', inicio: '2026-10-31', fim: '2026-10-01' });
 
@@ -439,6 +446,15 @@ describe('validações adicionais de publicação', () => {
       .send(doacaoValida({ quantidade: 'abc' }));
     expect(res.status).toBe(400);
     expect(res.body.erro).toMatch(/quantidade/i);
+  });
+
+  it('recusa validade que não existe no calendário', async () => {
+    const res = await request(app)
+      .post('/api/doacoes')
+      .send(doacaoValida({ validade: '2099-02-31' }));
+
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toMatch(/validade/i);
   });
 
   it('recusa validade fora do formato AAAA-MM-DD', async () => {
