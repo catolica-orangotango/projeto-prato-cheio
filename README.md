@@ -68,9 +68,7 @@ tests/               testes automatizados
 docs/analise.md      documento de análise   (Trabalho 1)
 docs/projeto.md      documento de projeto   (Trabalho 2)
 docs/adr/            decisões arquiteturais (Trabalho 2)
-docs/validacao.md    validação e testes     (Trabalho 3)
-docs/refatoracoes.md refatorações feitas    (Trabalho 3)
-docs/demo.md         roteiro da demo        (Trabalho 3)
+docs/diagramas/      diagramas UML: versão da IA, final e correções (N2)
 docs/retrospectivas/ retrospectiva de cada iteração
 .github/workflows/   pipeline de CI
 ```
