@@ -4,7 +4,7 @@
 
 **Grupo:** Gustavo Vinicius Taques, João Pedro Angélico, Luis Fernando Pereira, Vynicyus Candido
 
-**Estado:** a história zero (publicar, ver, aceitar) roda ponta a ponta; 11 testes verdes com `npm test`. As regras de negócio 1, 2 e 3 estão implementadas e cobertas por teste. As histórias 3, 4 e 5 ficam para a Unidade 2 (ver "Decisão de análise").
+**Estado:** a história zero (publicar, ver, aceitar) roda ponta a ponta; 11 testes verdes com `npm test`. As regras de negócio 1, 2 e 3 estão implementadas e cobertas por teste. As histórias 3, 4 e 5 ficaram para a Unidade 2 (ver "Decisão de análise"). **Atualização da U2:** as histórias 3 e 4 já estão implementadas e testadas (36 testes verdes); a história 5 segue pendente.
 
 ## Problema central
 

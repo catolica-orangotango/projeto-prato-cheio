@@ -90,8 +90,8 @@ teste automatizado, embora um critério possa virar um ou mais testes.
 > em `docs/analise.md` e a decisão em `docs/adr/0004-hu4-conta-doacoes-coletadas.md`.
 
 > Das três histórias acima, a **1** e a **2** compõem a história zero e já estão
-> implementadas e testadas (seção 4). A **4** tem os critérios definidos, mas a
-> implementação fica para a Unidade 2.
+> implementadas e testadas (seção 4). A **4** tinha os critérios definidos, mas a
+> implementação ficou para a Unidade 2, onde foi feita (ver a revisão acima).
 
 ---
 
