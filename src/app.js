@@ -58,5 +58,14 @@ export function criarApp() {
     }
   });
 
+  // História 5: doações que a ONG coletou, para a vigilância sanitária.
+  app.get('/api/relatorios/estoque', async (req, res) => {
+    try {
+      res.json(await doacoes.estoqueDaOng(req.query));
+    } catch (erro) {
+      res.status(400).json({ erro: erro.message });
+    }
+  });
+
   return app;
 }

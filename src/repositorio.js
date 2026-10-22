@@ -89,3 +89,17 @@ export async function contarColetadas(ong, inicio, fim) {
   // Number(): no PostgreSQL o COUNT(*) volta como bigint, que o driver entrega como texto.
   return Number(rows[0].total);
 }
+
+// Doações que a ONG coletou, da validade mais próxima para a mais distante.
+// Não filtra por validade: a vigilância precisa ver também o que já venceu.
+// História 5 / ADR 0005.
+export async function listarColetadasDaOng(ong) {
+  const { rows } = await query(
+    `SELECT * FROM doacoes
+     WHERE status = 'coletada'
+       AND ong = ?
+     ORDER BY validade ASC, id ASC`,
+    [ong],
+  );
+  return rows;
+}
