@@ -110,3 +110,24 @@ export async function totalColetadas({ ong, inicio, fim } = {}) {
   const total = await repo.contarColetadas(nome, datas.inicio, datas.fim);
   return { ong: nome, inicio: datas.inicio, fim: datas.fim, total };
 }
+
+// "A vigilância sanitária consulta o que a ONG coletou, para auditar a qualidade." (história 5)
+// O sistema não registra baixa (consumo ou distribuição), então "estoque" é o que a ONG
+// coletou, e cada item diz se a validade já passou (ADR 0005).
+export async function estoqueDaOng({ ong } = {}) {
+  if (vazio(ong)) {
+    throw new Error('informe a ONG');
+  }
+  const nome = String(ong).trim();
+  const limite = hoje();
+  const itens = (await repo.listarColetadasDaOng(nome)).map((d) => ({
+    id: d.id,
+    tipo: d.tipo,
+    quantidade: d.quantidade,
+    unidade: d.unidade,
+    validade: d.validade,
+    coletada_em: d.coletada_em,
+    vencida: d.validade < limite,
+  }));
+  return { ong: nome, total: itens.length, itens };
+}

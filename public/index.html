@@ -100,6 +100,16 @@
       <button id="consultar">Consultar</button>
       <p id="relatorio-resultado" aria-live="polite"></p>
     </fieldset>
+
+    <h2>Estoque da ONG (vigilância sanitária)</h2>
+    <fieldset>
+      <legend>Consultar doações coletadas pela ONG</legend>
+      <label for="estoque-ong">ONG</label>
+      <input id="estoque-ong" value="Minha ONG">
+      <button id="consultar-estoque">Consultar estoque</button>
+      <p id="estoque-resultado" aria-live="polite"></p>
+      <ul id="estoque-lista"></ul>
+    </fieldset>
   </main>
 
   <script>
@@ -177,6 +187,27 @@
       document.getElementById('relatorio-resultado').textContent = res.ok
         ? `${corpo.ong} coletou ${corpo.total} doação(ões) de ${corpo.inicio} a ${corpo.fim}.`
         : `Não foi possível consultar: ${corpo.erro}.`;
+    };
+
+    // História 5: a vigilância sanitária consulta o que a ONG coletou e vê o que já venceu.
+    document.getElementById('consultar-estoque').onclick = async () => {
+      const params = new URLSearchParams({ ong: document.getElementById('estoque-ong').value });
+      const res = await fetch(`/api/relatorios/estoque?${params}`);
+      const corpo = await res.json();
+      const resultado = document.getElementById('estoque-resultado');
+      const lista = document.getElementById('estoque-lista');
+      lista.innerHTML = '';
+      if (!res.ok) {
+        resultado.textContent = `Não foi possível consultar: ${corpo.erro}.`;
+        return;
+      }
+      resultado.textContent = `${corpo.ong} coletou ${corpo.total} doação(ões).`;
+      for (const d of corpo.itens) {
+        const li = document.createElement('li');
+        li.textContent = `${d.tipo}: ${d.quantidade} ${d.unidade} (validade ${d.validade}, coletada em ${d.coletada_em})`;
+        if (d.vencida) li.textContent += ' VENCIDA';
+        lista.appendChild(li);
+      }
     };
 
     carregar();

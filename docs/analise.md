@@ -4,7 +4,7 @@
 
 **Grupo:** Gustavo Vinicius Taques, João Pedro Angélico, Luis Fernando Pereira, Vynicyus Candido
 
-**Estado:** a história zero (publicar, ver, aceitar) roda ponta a ponta; 11 testes verdes com `npm test`. As regras de negócio 1, 2 e 3 estão implementadas e cobertas por teste. As histórias 3, 4 e 5 ficaram para a Unidade 2 (ver "Decisão de análise"). **Atualização da U2:** as histórias 3 e 4 já estão implementadas e testadas (36 testes verdes); a história 5 segue pendente.
+**Estado:** a história zero (publicar, ver, aceitar) roda ponta a ponta; 11 testes verdes com `npm test`. As regras de negócio 1, 2 e 3 estão implementadas e cobertas por teste. As histórias 3, 4 e 5 ficaram para a Unidade 2 (ver "Decisão de análise"). **Atualização da U2:** as histórias 3, 4 e 5 já estão implementadas e testadas (42 testes verdes). A história 5 foi fatiada no [ADR 0005](adr/0005-hu5-estoque-e-doacoes-coletadas.md).
 
 ## Problema central
 
@@ -56,7 +56,7 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 | 2 | Como **funcionário de ONG**, quero selecionar uma doação disponível, para que o entregador a colete antes que estrague. | Depende da 1 (não totalmente **I**ndependente), aceitável. É a metade "aceitar" da história zero. |
 | 3 | Como **entregador**, quero confirmar a retirada de uma doação aceita pela minha ONG no local do doador, para que a ONG saiba que o alimento foi recebido e a doação saia das pendentes. | Reformulada na U2. A versão original ("confirmar a presença do doador no ponto de entrega") falhava **V** e **I**: não havia fluxo de coleta e "ponto de entrega" não era modelado. A nova versão fecha o ciclo aceita → coletada. Localização fica com a RN4. |
 | 4 | Como **coordenador da ONG**, quero saber quantas doações coletamos num período, para acompanhar o volume. | Só ficou **E**stimável depois da história 3, que registra a coleta. Critérios revisados na U2 para contar coletas, não aceites ([ADR 0004](adr/0004-hu4-conta-doacoes-coletadas.md)). |
-| 5 | Como **agente da vigilância sanitária**, quero consultar os alimentos perecíveis em estoque da ONG, para auditar a qualidade. | Falha **E** e **S**: "estoque" pressupõe inventário no tempo, que o modelo não tem. Precisa ser fatiada. Adiada para a U2. |
+| 5 | Como **agente da vigilância sanitária**, quero consultar os alimentos perecíveis em estoque da ONG, para auditar a qualidade. | Falhava **E** e **S**: "estoque" pressupõe inventário no tempo, que o modelo não tem. Fatiada na U2: "estoque" passou a ser o que a ONG coletou, com a validade à vista e os vencidos marcados ([ADR 0005](adr/0005-hu5-estoque-e-doacoes-coletadas.md)). |
 
 ## Critérios de aceite
 
@@ -86,6 +86,14 @@ São objetivos de resultado (*outcome*), não de funcionalidade. Nenhuma tela, p
 - **CA 4.3**: Dado doações coletadas por várias ONGs no mesmo período; Quando o coordenador da ONG A consulta; Então apenas as doações da ONG A são contadas.
 - **CA 4.4**: Dado doações da ONG aceitas mas ainda não coletadas; Quando o coordenador consulta o período; Então essas doações não entram no total.
 - **CA 4.5**: Dado uma consulta sem a ONG, com data em formato inválido ou com início depois do fim; Quando o coordenador consulta; Então o sistema recusa e informa o motivo.
+
+**História 5: vigilância consulta o que a ONG coletou** (fatiada e implementada na U2; [ADR 0005](adr/0005-hu5-estoque-e-doacoes-coletadas.md))
+
+- **CA 5.1**: Dado doações coletadas por uma ONG; Quando o agente da vigilância consulta essa ONG; Então o sistema lista cada doação com tipo, quantidade, unidade, validade e data de coleta, da validade mais próxima para a mais distante.
+- **CA 5.2**: Dado uma doação coletada com validade anterior ao dia da consulta; Quando o agente consulta a ONG; Então a doação aparece na lista, marcada como vencida.
+- **CA 5.3**: Dado doações disponíveis, só aceitas e coletadas por outras ONGs; Quando o agente consulta a ONG A; Então apenas as doações coletadas pela ONG A entram na lista.
+- **CA 5.4**: Dado uma ONG sem doações coletadas; Quando o agente consulta; Então o sistema devolve uma lista vazia, sem erro.
+- **CA 5.5**: Dado uma consulta sem a ONG; Quando o agente consulta; Então o sistema recusa e informa o motivo.
 
 ## Riscos
 

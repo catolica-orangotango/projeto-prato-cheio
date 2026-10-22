@@ -436,6 +436,117 @@ describe('total de doações coletadas no período', () => {
 });
 
 // ---------------------------------------------------------------------------
+// História 5 (fatiada): a vigilância sanitária consulta as doações que a ONG
+// coletou, para auditar a qualidade (ADR 0005).
+// ---------------------------------------------------------------------------
+describe('estoque da ONG para a vigilância sanitária', () => {
+  beforeEach(async () => {
+    await migrar();
+    await limparBanco();
+  });
+  afterAll(async () => {
+    await encerrar();
+  });
+
+  // Insere a doação já pelo repositório (a validade pode estar no passado, o que a
+  // publicação não permitiria) e a deixa aceita e coletada pela ONG.
+  async function emEstoque(ong, extra = {}) {
+    const doacao = await repo.inserir({
+      tipo: 'Sopa',
+      quantidade: 10,
+      unidade: 'porções',
+      validade: validadeFutura,
+      ...extra,
+    });
+    await repo.aceitar(doacao.id, ong);
+    await repo.coletar(doacao.id);
+    return doacao;
+  }
+
+  const consultar = (params) => request(app).get('/api/relatorios/estoque').query(params);
+
+  // CA 5.1: lista com os dados da auditoria, da validade mais próxima para a mais distante
+  it('lista as doações coletadas pela ONG com os dados da auditoria, da validade mais próxima para a mais distante', async () => {
+    await emEstoque('Casa da Sopa', { tipo: 'Longe', validade: emDias(9) });
+    await emEstoque('Casa da Sopa', { tipo: 'Perto', quantidade: 3, unidade: 'caixas', validade: emDias(2) });
+
+    const res = await consultar({ ong: 'Casa da Sopa' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ong).toBe('Casa da Sopa');
+    expect(res.body.total).toBe(2);
+    expect(res.body.itens.map((i) => i.tipo)).toEqual(['Perto', 'Longe']);
+    expect(res.body.itens[0]).toMatchObject({
+      tipo: 'Perto',
+      quantidade: 3,
+      unidade: 'caixas',
+      validade: emDias(2),
+      vencida: false,
+    });
+    expect(res.body.itens[0].coletada_em).toBeTruthy();
+  });
+
+  // CA 5.2: o que já venceu aparece, marcado como vencido
+  it('mostra a doação com validade vencida, marcada como vencida', async () => {
+    await emEstoque('Casa da Sopa', { tipo: 'Velha', validade: emDias(-3) });
+    await emEstoque('Casa da Sopa', { tipo: 'Hoje', validade: emDias(0) });
+    await emEstoque('Casa da Sopa', { tipo: 'Nova', validade: emDias(3) });
+
+    const res = await consultar({ ong: 'Casa da Sopa' });
+    const vencida = Object.fromEntries(res.body.itens.map((i) => [i.tipo, i.vencida]));
+
+    expect(vencida).toEqual({ Velha: true, Hoje: false, Nova: false });
+  });
+
+  // CA 5.3: só entra o que a ONG consultada coletou
+  it('lista só o que a ONG consultada coletou, sem disponíveis, só aceitas ou de outras ONGs', async () => {
+    await emEstoque('ONG A', { tipo: 'Coletada da A' });
+    await emEstoque('ONG B', { tipo: 'Coletada da B' });
+    await repo.inserir({ tipo: 'Disponível', quantidade: 1, unidade: 'kg', validade: validadeFutura });
+    const aceita = await repo.inserir({
+      tipo: 'Só aceita',
+      quantidade: 1,
+      unidade: 'kg',
+      validade: validadeFutura,
+    });
+    await repo.aceitar(aceita.id, 'ONG A');
+
+    const res = await consultar({ ong: 'ONG A' });
+
+    expect(res.body.itens.map((i) => i.tipo)).toEqual(['Coletada da A']);
+    expect(res.body.total).toBe(1);
+  });
+
+  // CA 5.4: ONG sem doações coletadas
+  it('devolve lista vazia, sem erro, quando a ONG não coletou nada', async () => {
+    const res = await consultar({ ong: 'ONG A' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ong: 'ONG A', total: 0, itens: [] });
+  });
+
+  it('ignora espaços nas pontas do nome da ONG', async () => {
+    await emEstoque('Casa da Sopa');
+
+    const res = await consultar({ ong: '  Casa da Sopa ' });
+
+    expect(res.body.total).toBe(1);
+    expect(res.body.ong).toBe('Casa da Sopa');
+  });
+
+  // CA 5.5: consulta sem ONG é recusada
+  it('recusa a consulta sem a ONG ou com o nome só de espaços', async () => {
+    const semOng = await consultar({});
+    expect(semOng.status).toBe(400);
+    expect(semOng.body.erro).toMatch(/ONG/);
+
+    const vazia = await consultar({ ong: '   ' });
+    expect(vazia.status).toBe(400);
+    expect(vazia.body.erro).toMatch(/ONG/);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Cobertura adicional de validação (RN1): casos de borda que ainda não tinham
 // teste próprio, mas já são tratados pelo código em src/doacoes.js.
 // ---------------------------------------------------------------------------
