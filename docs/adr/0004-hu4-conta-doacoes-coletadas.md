@@ -1,7 +1,7 @@
 # ADR 0004 — História 4 conta doações coletadas, não aceitas
 
 - **Data:** 2026-10-14
-- **Status:** proposto (aguarda confirmação do grupo)
+- **Status:** aceito (confirmado pelo grupo)
 
 ## Contexto
 A história 4 ([#5](https://github.com/catolica-orangotango/projeto-prato-cheio/issues/5)) diz: *"Como coordenador da ONG, quero saber quantas doações **coletamos** em um período determinado"*. Os critérios de aceite escritos na aula 4 (`docs/atividades/aula4.md`, repetidos em `docs/analise.md`) contam outra coisa: o total de doações **aceitas** pela ONG, filtrado pela data de **aceite**.
