@@ -104,12 +104,13 @@ não tem diagrama de casos de uso. É texto, editável e versionado no Git.
 
 7. COMMITS DE CADA MEMBRO
 -------------------------
-Cada integrante fez ao menos um commit no branch docs/diagramas (conferir em
-"Commits" no Pull Request):
-  - Gustavo Vinicius Taques ..... ____________________________  (PREENCHER)
-  - João Pedro Angélico ......... ____________________________  (PREENCHER)
-  - Luis Fernando Pereira ....... ____________________________  (PREENCHER)
-  - Vynicyus Candido ............ ____________________________  (PREENCHER)
+Commits de cada integrante nesta entrega (PR #27 e PR desta seção):
+  - Gustavo Vinicius Taques ..... (PREENCHER: hash do seu commit)
+  - João Pedro Angélico ......... 557f59d, 0cac827, 50fb054, 3130200 (diagramas,
+                                  correções e entrega, PR #27)
+  - Luis Fernando Pereira ....... revisou e aprovou o PR #27
+                                  (PREENCHER: hash do seu commit)
+  - Vynicyus Candido ............ (PREENCHER: hash do seu commit)
 Cada integrante também fez sua própria entrega no Teams.
 
 
