@@ -5,6 +5,8 @@
 - **Revisa:** [ADR 0001](0001-banco-de-dados-sqlite-para-postgresql.md) — que permanece como registro histórico, sem alterações no texto da decisão.
 - **Resultado da revisão:** decisão do 0001 **mantida** (PostgreSQL), com escopo ampliado.
 
+> **Nota (2026-10-27):** o ADR 0001 cita `docs/refatoracoes.md` (Refatoração 1), arquivo que não existe no repositório. A migração para PostgreSQL ainda não foi feita; quando for, a evidência (testes antes e depois, CI verde) vai nos PRs da migração e em `docs/projeto.md`. O texto do 0001 não foi alterado, por ser registro histórico.
+
 ## Contexto
 O ADR 0001 foi tomado para um único bairro, com uma entidade (`doacoes`) e poucos acessos simultâneos. A premissa mudou: o Prato Cheio será usado por ONGs e doadores de **várias cidades**, com **acessos simultâneos** e **maior volume** de doações.
 
