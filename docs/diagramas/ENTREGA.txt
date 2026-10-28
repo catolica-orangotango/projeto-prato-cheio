@@ -18,12 +18,11 @@ Branch:        docs/diagramas
 2. DIAGRAMAS ESCOLHIDOS E JUSTIFICATIVA
 ---------------------------------------
 a) Diagrama de Casos de Uso (UML)
-   Pergunta que responde: quem usa o sistema e para quê? O que já existe e o que
-   ainda é só plano?
+   Pergunta que responde: quem usa o sistema e para quê?
    Justificativa: o caso tem 5 histórias e 5 papéis diferentes (doador, funcionário
-   de ONG, entregador, coordenador, vigilância sanitária), mas só H1, H2 e H3 estão
-   implementadas. O diagrama mostra o escopo real e separa o que ainda está pendente
-   (H4, H5), ligando cada caso de uso à sua história (H1 a H5) e às regras de
+   de ONG, entregador, coordenador, vigilância sanitária), e as 5 histórias estão
+   implementadas. O diagrama mostra cada ator ligado só ao que ele realmente faz no
+   sistema, com cada caso de uso ligado à sua história (H1 a H5) e às regras de
    negócio (RN1 a RN3).
 
 b) Diagrama de Classes (UML)
@@ -80,10 +79,12 @@ PROBLEMA 2 - Diagrama de Casos de Uso: <<extend>> usado em uma validação obrig
                  "Publicar doação" (tipo, quantidade inteira > 0, unidade e validade
                  hoje ou futura; se for inválido, recusa com erro 400 e nada é gravado).
 
-Outros problemas encontrados (detalhados em final/Pontos-Correção-dos-Códigos.md): login e cadastro de usuários
-inexistentes; notificação automática (só existe como hipótese do experimento);
-editar, excluir e cancelar aceite (nenhuma história pede); proximidade/endereço (RN4
-fora do escopo); histórias pendentes (H4, H5) desenhadas como implementadas; atributos
+Outros problemas encontrados (detalhados em final/Pontos-Correção-dos-Códigos.md):
+login e cadastro de usuários inexistentes; notificação automática (só existe como
+hipótese do experimento); editar, excluir e cancelar aceite (nenhuma história pede);
+proximidade/endereço (RN4 fora do escopo); atores errados (a Marta como
+administradora no relatório, que é do coordenador da ONG, e uma "ONG" genérica no
+lugar do funcionário); atributos
 da Doação diferentes do schema (quantidade double em vez de int, faltando unidade e
 criada_em); status VENCIDA e CANCELADA inexistentes; serviço acessando o
 SQLite direto, pulando o repositório e o db.js.
@@ -104,13 +105,17 @@ não tem diagrama de casos de uso. É texto, editável e versionado no Git.
 
 7. COMMITS DE CADA MEMBRO
 -------------------------
-Commits de cada integrante nesta entrega (PR #27 e PR desta seção):
-  - Gustavo Vinicius Taques ..... (PREENCHER: hash do seu commit)
-  - João Pedro Angélico ......... 557f59d, 0cac827, 50fb054, 3130200 (diagramas,
-                                  correções e entrega, PR #27)
-  - Luis Fernando Pereira ....... revisou e aprovou o PR #27
-                                  (PREENCHER: hash do seu commit)
-  - Vynicyus Candido ............ (PREENCHER: hash do seu commit)
+Commits de cada integrante (o hash aparece na aba "Commits" de cada PR):
+  - Gustavo Vinicius Taques ..... diagramas: (PREENCHER: hash do commit em vf-ia1.puml)
+                                  H5 implementada (PR #28)
+  - João Pedro Angélico ......... diagramas: 557f59d, 0cac827, 50fb054, 3130200
+                                  (PR #27) e esta seção (PR #31)
+                                  revisou e aprovou o PR #32
+  - Luis Fernando Pereira ....... diagramas: (PREENCHER: hash do commit nos Pontos)
+                                  revisou e aprovou o PR #27; H4 (PR #24) e
+                                  interface que avisa erros (PR #29)
+  - Vynicyus Candido ............ diagramas: (PREENCHER: hash do commit em vf-ia2.puml)
+                                  docs/projeto.md e retrospectiva 2 (PR #32)
 Cada integrante também fez sua própria entrega no Teams.
 
 
@@ -138,6 +143,8 @@ Qual dos dois diagramas foi mais útil para compreender ou questionar uma decis�
 O diagrama de classes. Ao corrigir a multiplicidade "*" -- "*" entre Doação e ONG,
 tivemos de explicar onde a RN3 está garantida de fato: na coluna única "ong" e na
 trava do UPDATE, e não em uma classe ONG. Isso também mostrou que o sistema não
-identifica a ONG de forma confiável (é texto livre, sem login), o que vai afetar a
-H4 (relatório por ONG) na Unidade 2. O diagrama de casos de uso foi mais útil para
-delimitar o escopo, mas não chegou a questionar nenhuma decisão técnica.
+identifica a ONG de forma confiável (é texto livre, sem login). O problema se
+confirmou na H4 e na H5: os relatórios buscam a ONG pelo nome digitado, então
+"Casa da Sopa" e "casa da sopa" contam como ONGs diferentes. O diagrama de casos
+de uso foi mais útil para delimitar o escopo, mas não chegou a questionar nenhuma
+decisão técnica.
