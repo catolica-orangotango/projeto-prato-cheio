@@ -1,7 +1,7 @@
 # ADR 0001 — Banco de dados: de SQLite para PostgreSQL
 
 - **Data:** 2026-10-07
-- **Status:** aceito (revisado em [ADR 0002](0002-revisao-banco-multicidade.md): decisão mantida)
+- **Status:** aceito (revisado em [ADR 0002](0002-revisao-banco-multicidade.md): decisão mantida). **Migração ainda não implementada:** o código segue em SQLite até a Unidade 3.
 
 ## Contexto
 O Prato Cheio guarda hoje uma única entidade, `doacoes` (`tipo`, `quantidade`, `unidade`, `validade`, `status`, `ong`, `criada_em`), em SQLite pelo módulo embutido `node:sqlite`, com SQL direto e sem ORM (`src/db.js`, `src/repositorio.js`). O arquivo é `dados.sqlite`; nos testes, o banco roda em memória.
