@@ -29,6 +29,8 @@ As histórias 1 e 2 (publicar e aceitar, Unidade 1) seguem na mesma suíte. Os c
 | D3 | A **história 5 é fatiada**: "estoque" = o que a ONG coletou, com a vencida à vista | Construir estoque real (baixa, perecível, login) · listar só o que está na validade | Falha de INVEST da H5; rastreabilidade mínima (CA 1.3, RN1) | [ADR 0005](adr/0005-hu5-estoque-e-doacoes-coletadas.md) |
 | D4 | **Trava no próprio SQL** para aceitar e coletar (`UPDATE ... WHERE status = ... RETURNING`) | Ler e depois gravar (check-then-act) · lock na aplicação | RN3: uma doação, uma ONG | comentários em `src/repositorio.js`; sem ADR próprio |
 | D5 | **Camadas** `app.js` → `doacoes.js` (regras) → `repositorio.js` (SQL) → `db.js` (conexão), SQL direto sem ORM | SQL nas rotas · ORM | Stakeholder "equipe": fácil de trocar de banco; testável | `src/`; sem ADR próprio |
+| D6 | A **interface envia a quantidade como digitada**; a RN1 é validada só no servidor | Converter só quando preenchido · validar também na tela | CA 1.2 (informar o motivo da recusa); RN1 | [ADR 0006](adr/0006-interface-envia-quantidade-sem-converter.md) |
+| D7 | **Playwright** para testes de fluxo pela interface, em `tests/e2e/`, fora do `npm test`, com job próprio no CI (proposto) | Cypress · Puppeteer · Selenium · só testes de API | Critérios de aceite das histórias 1 a 5 vistos pela tela; entregador no celular | [ADR 0007](adr/0007-playwright-para-testes-de-fluxo.md) |
 
 ## Trade-offs de uma decisão em detalhe (D1)
 
@@ -63,6 +65,8 @@ Ver `docs/adr/`.
 - [0001](adr/0001-banco-de-dados-sqlite-para-postgresql.md) — SQLite para PostgreSQL (obrigatório).
 - [0004](adr/0004-hu4-conta-doacoes-coletadas.md) — História 4 conta coletadas.
 - [0005](adr/0005-hu5-estoque-e-doacoes-coletadas.md) — História 5 fatiada.
+- [0006](adr/0006-interface-envia-quantidade-sem-converter.md) — Interface envia a quantidade sem converter.
+- [0007](adr/0007-playwright-para-testes-de-fluxo.md) — Playwright para testes de fluxo (proposto).
 - [0002](adr/0002-revisao-banco-multicidade.md) e [0003](adr/0003-reescrita-adr-postgresql-banco-melhor.md) — revisão do 0001 para o cenário multicidade e reescrita de um registro fraco (atividades de aula).
 
 ## Critérios de validação do projeto
