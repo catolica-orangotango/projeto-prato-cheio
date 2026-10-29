@@ -1,0 +1,115 @@
+CHECKLIST - N2 - PRATO CHEIO
+Prazo: 28/10/2026 às 23:59 (Teams)
+Situação conferida em 28/10/2026
+
+N2 = 50% Atividade de Diagramas + 50% Atividade 2 (Evolução do Projeto)
+
+RESPONSABILIDADES (resumo)
+  GUSTAVO   vf-ia1.puml (H4 e H5 deixam de ser "pendente") + sua linha da autoavaliação
+  VYNICYUS  vf-ia2.puml (rotas e funções da H4 e da H5) + sua linha da autoavaliação
+  LUIS      Pontos-Correção-dos-Códigos.md (UC-6 e linhas, por último) + sua linha
+  JOÃO      ENTREGA.txt [FEITO] + sua linha da autoavaliação [FEITO, PR #35]
+  TODOS     vídeo, pontos da autoavaliação, entrega individual no Teams
+
+
+######################################################################
+ATIVIDADE 1 - DIAGRAMAS
+######################################################################
+
+JÁ FEITO
+[x] Diagramas de Casos de Uso e Classes, versão da IA e versão final (docs/diagramas/)
+[x] Pontos-Correção-dos-Códigos.md com os 12 problemas
+[x] ENTREGA.txt com os 8 itens do enunciado
+[x] PR #27 (diagramas) aprovado pelo Luis e mergeado
+[x] PR #31 (ENTREGA.txt atualizado para H4 e H5) aprovado pelo Luis e mergeado
+[x] Commits do João: 557f59d, 0cac827, 50fb054, 3130200, cd76c91, 5b76c5b
+
+FALTA - ATUALIZAR OS DIAGRAMAS (H4 e H5 já estão implementadas)
+[ ] GUSTAVO - docs/diagramas/final/vf-ia1.puml (Casos de Uso)
+    - Tirar <<pendente>> de "Consultar volume coletado (H4)" e
+      "Consultar perecíveis da ONG (H5)"; remover o skinparam e a legenda de pendente.
+    - Nota na H4: conta só doações 'coletada' da ONG, pela data da coleta,
+      início e fim inclusivos (ADR 0004).
+    - Nota na H5: "estoque" = doações coletadas pela ONG, marcando as vencidas;
+      não há registro de baixa (ADR 0005).
+    - Nota em "Aceitar doação": doação vencida ainda pode ser aceita por chamada
+      direta à API (o UPDATE do aceite não confere a validade).
+
+[ ] VYNICYUS - docs/diagramas/final/vf-ia2.puml (Classes)
+    - app.js: + GET /api/relatorios/coletas  e  + GET /api/relatorios/estoque
+    - doacoes.js: + totalColetadas({ong, inicio, fim})  e  + estoqueDaOng({ong})
+    - repositorio.js: + contarColetadas(ong, inicio, fim)  e
+      + listarColetadasDaOng(ong)
+    - Nota no app.js: todo erro de regra volta como HTTP 400 (não há 404/409).
+
+[ ] LUIS - docs/diagramas/final/Pontos-Correção-dos-Códigos.md
+    (fazer DEPOIS dos PRs do Gustavo e do Vynicyus, porque as linhas mudam)
+    - UC-6: H4 e H5 agora existem. O erro da v1 passa a ser só o ator errado
+      ("Administrador (Marta)" no relatório, que é do Coordenador da ONG) e
+      o ator genérico "ONG"; "Consultar estoque" pela Vigilância ficou correto.
+    - Atualizar os números de linha que apontam para vf-ia1.puml e vf-ia2.puml.
+    - Trocar <<pendente>> por "H1-H5 implementadas" em "Detalhes para mencionar".
+
+[x] JOÃO - docs/diagramas/ENTREGA.txt (PR #31, mergeado)
+    [x] Item 2a: as 5 histórias (H1 a H5) estão implementadas
+    [x] "Outros problemas": trocado por "atores errados"
+    [x] Reflexão final: problema da ONG como texto livre confirmado na H4 e na H5
+    [x] Seção 7: commits do João e contribuições de cada colega
+    [ ] Seção 7: hashes dos commits de Gustavo, Luis e Vynicyus nos diagramas
+        (cada um troca o próprio PREENCHER depois do seu PR)
+
+ENTREGA NO TEAMS (cada integrante)
+[ ] Gustavo   [ ] João   [ ] Luis   [ ] Vynicyus
+    Mensagem: link do repositório, link do PR #27 e "comece por docs/diagramas/ENTREGA.txt"
+    Anexos: ENTREGA.txt, v1-ia/versao-ia1.puml, v1-ia/versao-ia2.puml,
+            final/vf-ia1.puml, final/vf-ia2.puml, final/Pontos-Correção-dos-Códigos.md
+
+
+######################################################################
+ATIVIDADE 2 - EVOLUÇÃO DO PROJETO
+######################################################################
+
+PARTE 1 - EVOLUIR O SISTEMA
+[x] Pelo menos 2 histórias com critérios de aceite: H3, H4 e H5 (CA em docs/analise.md)
+[x] 2 ADRs, um sobre SQLite -> PostgreSQL: ADR 0001, 0004 e 0005
+[x] 3 requisitos não funcionais: docs/projeto.md (integridade, portabilidade, datas)
+[x] Testes com situações de erro: 42 testes, CI verde na main
+[x] PRs revisados por outro integrante: #24, #27, #28, #29, #31, #32
+
+PARTE 2 - VÍDEO (5 a 8 minutos)
+[ ] Nome dos integrantes e link do repositório
+[ ] Prato Cheio funcionando com H3, H4 e H5
+[ ] Decisões técnicas e ADRs
+[ ] Evidência dos testes (npm test) e dos PRs
+[ ] Cada integrante explica sua contribuição e mostra seu GitHub
+[ ] Todos participam
+[ ] Vídeo publicado e link compartilhado com o grupo
+
+PARTE 3 - DOCUMENTAR E REFLETIR
+[x] docs/projeto.md (PR #32)
+[x] docs/adr/ (ADRs 0001, 0004 e 0005)
+[x] docs/retrospectivas/2.md com dificuldades, aprendizados, uso de IA e reflexão final
+[x] Código e testes atualizados
+[ ] Autoavaliação em docs/retrospectivas/2.md (tabela no final, linha 34)
+    [x] Linha do João preenchida (PR #35, aguardando revisão)
+    [ ] Linha do Gustavo
+    [ ] Linha do Luis
+    [ ] Linha do Vynicyus
+    [ ] Pontos definidos pelo grupo (total 100)
+    [ ] PR #35 revisado e mergeado
+
+BRANCH entrega-2
+[x] Criado a partir da main (88f3807)
+[ ] Atualizado para a main final, DEPOIS de todos os merges e antes das 23:59
+
+ENTREGA NO TEAMS (cada integrante)
+[ ] Gustavo   [ ] João   [ ] Luis   [ ] Vynicyus
+    - Link do repositório e do branch entrega-2:
+      https://github.com/catolica-orangotango/projeto-prato-cheio/tree/entrega-2
+    - Links dos PRs que revisou
+      (João: https://github.com/catolica-orangotango/projeto-prato-cheio/pull/32)
+    - Link do vídeo
+    - Documentação: docs/projeto.md, docs/adr/, docs/retrospectivas/2.md
+      Testes: tests/doacoes.test.js
+    - Commits de sua autoria
+      (João: 557f59d, 0cac827, 50fb054, 3130200, cd76c91, 5b76c5b, a22ed6a)
