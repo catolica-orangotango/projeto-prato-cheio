@@ -3,12 +3,6 @@
 left to right direction
 title Prato Cheio - Diagrama de Casos de Uso (versão final)
 
-skinparam usecase {
-  BackgroundColor<<pendente>> #F2F2F2
-  BorderColor<<pendente>> #999999
-  FontColor<<pendente>> #777777
-}
-
 actor "Doador\n(restaurante, padaria, mercado)" as Doador
 actor "Funcionário de ONG" as ONG
 actor "Entregador" as Entregador
@@ -22,8 +16,8 @@ rectangle "Prato Cheio" {
   usecase "Ver doações aguardando\nretirada (H3)" as UC4
   usecase "Confirmar retirada\n(H3)" as UC5
 
-  usecase "Consultar volume coletado\n(H4)" as UC6 <<pendente>>
-  usecase "Consultar perecíveis da ONG\n(H5, ainda a fatiar)" as UC7 <<pendente>>
+  usecase "Consultar volume coletado\n(H4)" as UC6
+  usecase "Consultar perecíveis da ONG\n(H5)" as UC7
 }
 
 Doador -- UC1
@@ -51,6 +45,9 @@ note right of UC3
   a segunda recebe erro (CA 2.2).
   A ONG é identificada por um nome
   livre: não há login.
+  Doação vencida ainda pode ser aceita
+  por chamada direta à API: o UPDATE
+  do aceite não confere a validade.
 end note
 
 note right of UC5
@@ -59,8 +56,15 @@ note right of UC5
   Grava coletada_em (CA 3.1).
 end note
 
-legend right
-  Casos de uso cinzas (<<pendente>>): levantados na análise,
-  ainda não implementados. Não existem no sistema hoje.
-endlegend
+note right of UC6
+  Conta só doações 'coletada' da ONG,
+  pela data da coleta, com início e fim
+  inclusivos (ADR 0004).
+end note
+
+note right of UC7
+  "Estoque" = doações coletadas pela ONG,
+  com as vencidas marcadas. Não há registro
+  de baixa (ADR 0005).
+end note
 @enduml
