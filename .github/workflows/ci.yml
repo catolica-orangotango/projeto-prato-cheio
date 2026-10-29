@@ -83,3 +83,38 @@ jobs:
           npm start &
           sleep 3
           curl --fail http://localhost:3000/api/saude
+
+  # Testes de fluxo pela interface, com Playwright (ADR 0007).
+  # Roda depois do job acima para não gastar o download do navegador
+  # quando o lint ou os testes de API já falharam.
+  testes-de-fluxo:
+    runs-on: ubuntu-latest
+    needs: build-e-testes
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Instalar o Chromium do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Rodar os testes de fluxo
+        run: npm run test:e2e
+
+      # Relatório com screenshot e trace do que falhou, para baixar no run.
+      - name: Guardar o relatório dos testes de fluxo
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: relatorio-testes-de-fluxo
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

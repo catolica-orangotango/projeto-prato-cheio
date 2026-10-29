@@ -34,6 +34,13 @@ npm run formatar         # Prettier: formata src/, tests/ e configs
 npm run test:cobertura   # testes + relatório de cobertura em coverage/index.html
 ```
 
+Testes de fluxo pela interface, com Playwright ([ADR 0007](docs/adr/0007-playwright-para-testes-de-fluxo.md)). Eles abrem o Chromium em tamanho de celular e clicam como o usuário, por isso ficam fora do `npm test`:
+
+```bash
+npx playwright install chromium   # só na primeira vez: baixa o navegador
+npm run test:e2e                  # sobe o servidor com banco em memória e roda tests/e2e/
+```
+
 Os testes usam SQLite **em memória**, então não sujam o banco de desenvolvimento.
 
 > Ao rodar `npm test` o Node imprime `ExperimentalWarning: SQLite is an experimental feature`.
@@ -64,7 +71,8 @@ src/app.js           rotas da API
 src/doacoes.js       regras de negócio      <- implementar (U1)
 src/repositorio.js   acesso ao banco (SQL)  <- implementar (U1)
 public/index.html    interface (funciona no celular)
-tests/               testes automatizados
+tests/               testes automatizados (API e regras)
+tests/e2e/           testes de fluxo pela interface (Playwright)
 docs/analise.md      documento de análise   (Trabalho 1)
 docs/projeto.md      documento de projeto   (Trabalho 2)
 docs/adr/            decisões arquiteturais (Trabalho 2)

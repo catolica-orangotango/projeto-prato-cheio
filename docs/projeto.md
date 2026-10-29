@@ -30,7 +30,7 @@ As histórias 1 e 2 (publicar e aceitar, Unidade 1) seguem na mesma suíte. Os c
 | D4 | **Trava no próprio SQL** para aceitar e coletar (`UPDATE ... WHERE status = ... RETURNING`) | Ler e depois gravar (check-then-act) · lock na aplicação | RN3: uma doação, uma ONG | comentários em `src/repositorio.js`; sem ADR próprio |
 | D5 | **Camadas** `app.js` → `doacoes.js` (regras) → `repositorio.js` (SQL) → `db.js` (conexão), SQL direto sem ORM | SQL nas rotas · ORM | Stakeholder "equipe": fácil de trocar de banco; testável | `src/`; sem ADR próprio |
 | D6 | A **interface envia a quantidade como digitada**; a RN1 é validada só no servidor | Converter só quando preenchido · validar também na tela | CA 1.2 (informar o motivo da recusa); RN1 | [ADR 0006](adr/0006-interface-envia-quantidade-sem-converter.md) |
-| D7 | **Playwright** para testes de fluxo pela interface, em `tests/e2e/`, fora do `npm test` (proposto, não implementado) | Cypress · Puppeteer · Selenium · só testes de API | Critérios de aceite das histórias 1 a 5 vistos pela tela; entregador no celular | [ADR 0007](adr/0007-playwright-para-testes-de-fluxo.md) |
+| D7 | **Playwright** para testes de fluxo pela interface, em `tests/e2e/`, fora do `npm test`, com job próprio no CI (proposto) | Cypress · Puppeteer · Selenium · só testes de API | Critérios de aceite das histórias 1 a 5 vistos pela tela; entregador no celular | [ADR 0007](adr/0007-playwright-para-testes-de-fluxo.md) |
 
 ## Trade-offs de uma decisão em detalhe (D1)
 
