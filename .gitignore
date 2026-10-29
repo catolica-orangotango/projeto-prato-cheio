@@ -13,3 +13,7 @@ dados.sqlite-journal
 
 # relatório de cobertura (npm run test:cobertura)
 coverage/
+
+# resultados dos testes de fluxo (npm run test:e2e)
+playwright-report/
+test-results/

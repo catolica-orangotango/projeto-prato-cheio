@@ -31,7 +31,7 @@ Fizemos um teste de fluxo exploratório com Playwright cobrindo as histórias 1 
 Alternativa 1. Os testes de fluxo usam `@playwright/test`, em `tests/e2e/`, separados da suíte do Vitest:
 
 - **Comando próprio** (`npm run test:e2e`), para que `npm test` continue rápido e sem navegador.
-- **Servidor e banco isolados:** o `webServer` do Playwright sobe `src/server.js` numa porta própria com `DATABASE_FILE` apontando para um arquivo temporário, apagado a cada execução; o `dados.sqlite` de desenvolvimento nunca é tocado. `reuseExistingServer: false`, porque no teste exploratório um servidor esquecido de uma execução anterior, com banco sujo, derrubou vários passos em cascata.
+- **Servidor e banco isolados:** o `webServer` do Playwright sobe `src/server.js` numa porta própria com `DATABASE_FILE=:memory:`, como o Vitest: o banco nasce vazio a cada execução e some quando o servidor para; o `dados.sqlite` de desenvolvimento nunca é tocado. `reuseExistingServer: false`, porque no teste exploratório um servidor esquecido de uma execução anterior, com banco sujo, derrubou vários passos em cascata.
 - **Só Chromium com viewport de celular** no começo, por ser o caso de uso principal (entregador na rua). Firefox e WebKit entram se aparecer defeito específico de navegador.
 - **Preparo de cenários pela API** (`request`), e verificação pela tela: o teste clica onde o usuário clica e só usa a API para simular outro ator (outra ONG, outra aba).
 - **CI:** um job a mais, depois do job atual, com `npx playwright install --with-deps chromium` e o relatório HTML publicado como artefato quando falhar.

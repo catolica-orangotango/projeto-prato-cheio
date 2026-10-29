@@ -8,6 +8,7 @@
     "start": "node --no-warnings=ExperimentalWarning src/server.js",
     "dev": "node --no-warnings=ExperimentalWarning --watch src/server.js",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "db:migrar": "node --no-warnings=ExperimentalWarning -e \"import('./src/db.js').then(async d=>{await d.migrar();console.log('schema criado');await d.encerrar()})\"",
     "test:cobertura": "vitest run --coverage",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
     "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
