@@ -6,6 +6,8 @@ Conecta doadores de alimentos excedentes a ONGs, antes que a comida se perca.
 > Este repositório é a base do produto que evolui nas três unidades:
 > walking skeleton (U1) → incremento guiado pelo projeto (U2) → produto refatorado (U3).
 
+**Documentação:** fica em [`docs/`](docs/). Comece pela [análise](docs/analise.md) e pelo [projeto](docs/projeto.md); o mapa completo está na seção [Documentação](#documentação).
+
 ## Integrantes
 - Gustavo Vinicius Taques (@gustavotaques)
 - João Pedro Angélico (@joaopedroangelico)
@@ -22,31 +24,70 @@ Requisito: **Node.js 22.13 ou superior**. Mais nada — o banco da Unidade 1 é 
 npm install       # só na primeira vez
 npm run db:migrar # cria o schema (arquivo dados.sqlite)
 npm start         # sobe em http://localhost:3000
-npm test          # roda os testes
+npm test          # roda os testes de API e regras (detalhes abaixo)
 npm run dev       # sobe recarregando a cada alteração
 ```
 
-Qualidade de código (o CI roda os três):
+> **Atenção:** não deixe o repositório dentro de uma pasta sincronizada (OneDrive, Google Drive, Dropbox) nem em disco de rede. O SQLite precisa de trava de arquivo e nesses lugares falha com `disk I/O error`. Clone em uma pasta local comum, por exemplo `~/dev/`.
+
+## Como rodar os testes
+
+São dois tipos de teste, os dois com **Node.js 22.13 ou superior** (com nvm: `nvm use 22`). Nenhum deles toca o `dados.sqlite`: todos usam SQLite **em memória**.
+
+### Testes de API e regras de negócio (Vitest)
+
+Ficam em `tests/*.test.js` e chamam as rotas e as regras direto, sem navegador.
 
 ```bash
-npm run lint             # ESLint: aponta erros comuns no código
-npm run formatar         # Prettier: formata src/, tests/ e configs
-npm run test:cobertura   # testes + relatório de cobertura em coverage/index.html
+npm test                 # roda todos, em segundos
+npm run test:cobertura   # o mesmo, com relatório em coverage/index.html
 ```
-
-Testes de fluxo pela interface, com Playwright ([ADR 0007](docs/adr/0007-playwright-para-testes-de-fluxo.md)). Eles abrem o Chromium em tamanho de celular e clicam como o usuário, por isso ficam fora do `npm test`:
-
-```bash
-npx playwright install chromium   # só na primeira vez: baixa o navegador
-npm run test:e2e                  # sobe o servidor com banco em memória e roda tests/e2e/
-```
-
-Os testes usam SQLite **em memória**, então não sujam o banco de desenvolvimento.
 
 > Ao rodar `npm test` o Node imprime `ExperimentalWarning: SQLite is an experimental feature`.
 > É esperado — o módulo embutido `node:sqlite` ainda é marcado como experimental. Não é erro e não reprova o CI.
 
-> **Atenção:** não deixe o repositório dentro de uma pasta sincronizada (OneDrive, Google Drive, Dropbox) nem em disco de rede. O SQLite precisa de trava de arquivo e nesses lugares falha com `disk I/O error`. Clone em uma pasta local comum, por exemplo `~/dev/`.
+### Testes de fluxo pela interface (Playwright)
+
+Ficam em `tests/e2e/*.e2e.js`. Abrem o Chromium em tamanho de celular e clicam na tela como o usuário, cobrindo as histórias 1 a 5 ([ADR 0007](docs/adr/0007-playwright-para-testes-de-fluxo.md)). Por usarem navegador, ficam fora do `npm test`.
+
+```bash
+npx playwright install chromium   # só na primeira vez: baixa o navegador (~120 MB)
+npm run test:e2e                  # roda todos
+```
+
+O `npm run test:e2e` sobe sozinho o próprio servidor, na porta 3100, com banco em memória; não precisa rodar `npm start` antes.
+
+```bash
+npx playwright test publicar   # só um arquivo (nome parcial serve)
+npx playwright test --headed   # mostra o navegador abrindo e clicando
+npx playwright test --ui       # modo interativo, passo a passo
+npx playwright show-report     # abre o relatório HTML da última execução
+```
+
+Quando um teste falha, a screenshot e o trace ficam em `test-results/`. Para ver o trace: `npx playwright show-trace test-results/<pasta-do-teste>/trace.zip`.
+
+### Qualidade de código
+
+```bash
+npm run lint             # ESLint: aponta erros comuns no código
+npm run formatar         # Prettier: formata src/, tests/ e configs
+npm run formatar:checar  # Prettier: só confere, sem alterar
+```
+
+O CI (`.github/workflows/ci.yml`) roda lint, formatação, `npm run test:cobertura` e, num job separado, `npm run test:e2e`. O Pull Request só entra com tudo verde.
+
+## Documentação
+
+Toda a documentação do projeto fica na pasta [`docs/`](docs/):
+
+| O quê | Onde |
+|---|---|
+| **Análise**: stakeholders, histórias de usuário, critérios de aceite (CA), regras de negócio (RN), riscos | [`docs/analise.md`](docs/analise.md) |
+| **Projeto**: arquitetura, decisões de projeto (D1, D2…), como cada história foi implementada e testada | [`docs/projeto.md`](docs/projeto.md) |
+| **ADRs**: cada decisão arquitetural com contexto, alternativas e consequências (modelo em `0000`) | [`docs/adr/`](docs/adr/) |
+| **Diagramas UML**: versão gerada pela IA, versão final e correções | [`docs/diagramas/`](docs/diagramas/) |
+| **Retrospectivas** de cada iteração | [`docs/retrospectivas/`](docs/retrospectivas/) |
+| **Atividades de aula** | [`docs/atividades/`](docs/atividades/) |
 
 ## O banco: SQLite agora, PostgreSQL depois
 
@@ -71,8 +112,9 @@ src/app.js           rotas da API
 src/doacoes.js       regras de negócio      <- implementar (U1)
 src/repositorio.js   acesso ao banco (SQL)  <- implementar (U1)
 public/index.html    interface (funciona no celular)
-tests/               testes automatizados (API e regras)
+tests/               testes de API e regras (Vitest)
 tests/e2e/           testes de fluxo pela interface (Playwright)
+docs/                documentação (ver a seção Documentação)
 docs/analise.md      documento de análise   (Trabalho 1)
 docs/projeto.md      documento de projeto   (Trabalho 2)
 docs/adr/            decisões arquiteturais (Trabalho 2)
